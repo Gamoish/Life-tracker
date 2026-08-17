@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tracker}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tracker}
+      POSTGRES_DB: ${POSTGRES_DB:-tracker}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tracker} -d ${POSTGRES_DB:-tracker}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Inside the compose network the database host is the service name, `db`.
+      DATABASE_URL: postgres://${POSTGRES_USER:-tracker}:${POSTGRES_PASSWORD:-tracker}@db:5432/${POSTGRES_DB:-tracker}
+      APP_PASSWORD: ${APP_PASSWORD:?set APP_PASSWORD in .env}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
+      APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports:
+      - "3000:3000"
+
+  backup:
+    build:
+      context: ./backup
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Internal docker network, not the host's 5433 — the dump only needs to
+      # reach `db`, so it works the same whether or not the host port is published.
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-tracker}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-tracker}
+      PGDATABASE: ${POSTGRES_DB:-tracker}
+      # Local hour the daily dump runs at (crond respects TZ via the image's tzdata).
+      BACKUP_HOUR: ${BACKUP_HOUR:-2}
+      TZ: ${APP_TIMEZONE:-UTC}
+      # Set to e.g. gdrive:tracker-backups to enable the optional cloud-sync
+      # hook in backup.sh — see backups/README.md. Unset by default.
+      RCLONE_REMOTE: ${RCLONE_REMOTE:-}
+    volumes:
+      - ./backups:/backups
+
+volumes:
+  pgdata:

@@ -1,0 +1,158 @@
+{
+  "slug": "frontend",
+  "name": "Frontend",
+  "groups": [
+    { "title": "Internet", "topics": [
+      { "title": "How does the internet work?" },
+      { "title": "What is HTTP?" },
+      { "title": "What is Domain Name?" },
+      { "title": "What is hosting?" },
+      { "title": "DNS and how it works?" },
+      { "title": "Browsers and how they work?" }
+    ]},
+    { "title": "HTML", "topics": [
+      { "title": "Learn the basics" },
+      { "title": "Writing Semantic HTML" },
+      { "title": "Forms and Validations" },
+      { "title": "Accessibility" },
+      { "title": "SEO Basics" }
+    ]},
+    { "title": "CSS", "topics": [
+      { "title": "Learn the basics" },
+      { "title": "Making Layouts" },
+      { "title": "Responsive Design" }
+    ]},
+    { "title": "JavaScript", "topics": [
+      { "title": "Learn the Basics" },
+      { "title": "Learn DOM Manipulation" },
+      { "title": "Fetch API / Ajax (XHR)" }
+    ]},
+    { "title": "Version Control Systems", "topics": [
+      { "title": "Git", "kind": "recommended" }
+    ]},
+    { "title": "VCS Hosting", "topics": [
+      { "title": "GitHub", "kind": "recommended" },
+      { "title": "GitLab", "kind": "alternative" },
+      { "title": "Bitbucket", "kind": "alternative" }
+    ]},
+    { "title": "Package Managers", "topics": [
+      { "title": "npm", "kind": "recommended" },
+      { "title": "pnpm", "kind": "alternative" },
+      { "title": "yarn", "kind": "alternative" }
+    ]},
+    { "title": "Pick a Framework", "topics": [
+      { "title": "React", "kind": "recommended" },
+      { "title": "Angular", "kind": "alternative" },
+      { "title": "Vue.js", "kind": "alternative" },
+      { "title": "Svelte", "kind": "alternative" },
+      { "title": "Solid JS", "kind": "optional" },
+      { "title": "Qwik", "kind": "optional" }
+    ]},
+    { "title": "Writing CSS", "topics": [
+      { "title": "Tailwind", "kind": "recommended" },
+      { "title": "CSS-in-JS", "kind": "optional" },
+      { "title": "CSS Modules", "kind": "optional" },
+      { "title": "Styled Components", "kind": "optional" }
+    ]},
+    { "title": "CSS Architecture", "topics": [
+      { "title": "BEM", "kind": "recommended" }
+    ]},
+    { "title": "CSS Preprocessors", "topics": [
+      { "title": "Sass" },
+      { "title": "PostCSS" }
+    ]},
+    { "title": "Build Tools — Linters & Formatters", "topics": [
+      { "title": "Prettier", "kind": "recommended" },
+      { "title": "ESLint", "kind": "recommended" }
+    ]},
+    { "title": "Build Tools — Module Bundlers", "topics": [
+      { "title": "Vite", "kind": "recommended" },
+      { "title": "esbuild", "kind": "alternative" },
+      { "title": "Webpack", "kind": "alternative" },
+      { "title": "Rollup", "kind": "alternative" },
+      { "title": "Parcel", "kind": "alternative" }
+    ]},
+    { "title": "Testing", "topics": [
+      { "title": "Vitest", "kind": "recommended" },
+      { "title": "Jest", "kind": "alternative" },
+      { "title": "Playwright", "kind": "recommended" },
+      { "title": "Cypress", "kind": "alternative" }
+    ]},
+    { "title": "Authentication Strategies", "topics": [
+      { "title": "JWT" },
+      { "title": "OAuth" },
+      { "title": "SSO" },
+      { "title": "Basic Auth" },
+      { "title": "Session Auth" }
+    ]},
+    { "title": "Web Security Basics", "topics": [
+      { "title": "CORS" },
+      { "title": "HTTPS" },
+      { "title": "Content Security Policy" },
+      { "title": "OWASP Security Risks" }
+    ]},
+    { "title": "Web Components", "topics": [
+      { "title": "Custom Elements" },
+      { "title": "HTML Templates" },
+      { "title": "Shadow DOM" }
+    ]},
+    { "title": "Type Checkers", "topics": [
+      { "title": "TypeScript", "kind": "recommended" }
+    ]},
+    { "title": "SSR", "topics": [
+      { "title": "Next.js (React)", "kind": "recommended" },
+      { "title": "react-router" },
+      { "title": "Nuxt.js (Vue)", "kind": "alternative" },
+      { "title": "Svelte Kit", "kind": "alternative" },
+      { "title": "Angular", "kind": "alternative" },
+      { "title": "Astro", "kind": "alternative" }
+    ]},
+    { "title": "GraphQL", "topics": [
+      { "title": "Apollo", "kind": "recommended" },
+      { "title": "Relay Modern", "kind": "alternative" }
+    ]},
+    { "title": "Static Site Generators", "topics": [
+      { "title": "Astro", "kind": "recommended" },
+      { "title": "Next.js" },
+      { "title": "Nuxt.js" },
+      { "title": "Vuepress" },
+      { "title": "Eleventy" }
+    ]},
+    { "title": "PWAs", "topics": [
+      { "title": "Service Workers" },
+      { "title": "Web Sockets" },
+      { "title": "Server Sent Events" },
+      { "title": "Storage" },
+      { "title": "Location" },
+      { "title": "Notifications" },
+      { "title": "Device Orientation" },
+      { "title": "Payments" },
+      { "title": "Credentials" },
+      { "title": "Performance Best Practices" }
+    ]},
+    { "title": "Mobile Apps", "topics": [
+      { "title": "React Native", "kind": "alternative" },
+      { "title": "Flutter", "kind": "alternative" },
+      { "title": "Ionic", "kind": "alternative" }
+    ]},
+    { "title": "Desktop Apps", "topics": [
+      { "title": "Electron", "kind": "alternative" },
+      { "title": "Tauri", "kind": "alternative" },
+      { "title": "Flutter", "kind": "alternative" }
+    ]},
+    { "title": "Performance", "topics": [
+      { "title": "PRPL Pattern" },
+      { "title": "RAIL Model" },
+      { "title": "Performance Metrics" },
+      { "title": "Using Lighthouse" },
+      { "title": "Using DevTools" }
+    ]},
+    { "title": "Browser APIs", "topics": [
+      { "title": "Storage" },
+      { "title": "Web Sockets" },
+      { "title": "Service Workers" },
+      { "title": "Location" },
+      { "title": "Notifications" }
+    ]}
+  ]
+}

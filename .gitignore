@@ -1,0 +1,11 @@
+node_modules
+.next
+next-env.d.ts
+.env
+.env.local
+*.tsbuildinfo
+test-results
+playwright-report
+
+# Database dumps — personal data (habits, health, finances). Never committed.
+backups/*.sql

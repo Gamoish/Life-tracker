@@ -1,0 +1,2 @@
+CREATE TYPE "public"."habit_color" AS ENUM('accent', 'rose', 'amber', 'green', 'teal', 'blue', 'violet', 'pink');--> statement-breakpoint
+ALTER TABLE "habits" ADD COLUMN "color" "habit_color" DEFAULT 'accent' NOT NULL;

@@ -1,0 +1,90 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1786795527255,
+      "tag": "0000_military_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786859136400,
+      "tag": "0001_rapid_warlock",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786885316695,
+      "tag": "0002_drop_dsa",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786885617421,
+      "tag": "0003_habit_scheduled_days_add",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786885631018,
+      "tag": "0004_habit_scheduled_days_drop_cadence",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786885646257,
+      "tag": "0005_goal_category_and_term",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786888337293,
+      "tag": "0006_habit_color",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786904741011,
+      "tag": "0007_tasks_and_expenses",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786908665639,
+      "tag": "0008_sleep_food_bills_budgets_journal_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786909704739,
+      "tag": "0009_thick_shinobi_shaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786909727844,
+      "tag": "0010_abnormal_miek",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786944164044,
+      "tag": "0011_dazzling_queen_noir",
+      "breakpoints": true
+    }
+  ]
+}
