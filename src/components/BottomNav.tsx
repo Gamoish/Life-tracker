@@ -17,7 +17,7 @@ import { IconMore, MOBILE_MORE, MOBILE_PRIMARY, isActive } from "./nav-items";
  * crowding this row — see `nav-items.tsx` for why the list is split this way.
  */
 export default function BottomNav() {
-  const pathname = usePathname(ffffffffff);
+  const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreActive = MOBILE_MORE.some((d) => isActive(pathname, d.href));
 
