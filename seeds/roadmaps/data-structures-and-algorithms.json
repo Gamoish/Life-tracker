@@ -1,0 +1,15 @@
+{
+  "slug": "data-structures-and-algorithms",
+  "name": "Data Structures & Algorithms",
+  "groups": [
+    { "title": "Programming Fundamentals", "topics": [{ "title": "Pick a language" }, { "title": "Language syntax" }, { "title": "Control structures" }, { "title": "Functions" }, { "title": "OOP basics" }, { "title": "Pseudocode" }] },
+    { "title": "Basic Data Structures", "topics": [{ "title": "Arrays" }, { "title": "Linked lists" }, { "title": "Stacks" }, { "title": "Queues" }, { "title": "Hash tables" }] },
+    { "title": "Complexity & Notation", "topics": [{ "title": "Time vs space complexity" }, { "title": "Calculating complexity" }, { "title": "Common runtimes" }, { "title": "Big-O notation" }, { "title": "Big-Theta notation" }, { "title": "Big-Omega notation" }] },
+    { "title": "Sorting & Searching", "topics": [{ "title": "Bubble sort" }, { "title": "Insertion sort" }, { "title": "Selection sort" }, { "title": "Merge sort" }, { "title": "Quick sort" }, { "title": "Heap sort" }, { "title": "Linear search" }, { "title": "Binary search" }] },
+    { "title": "Trees", "topics": [{ "title": "Binary trees" }, { "title": "Binary search trees" }, { "title": "AVL trees" }, { "title": "B-trees" }, { "title": "Breadth-first traversal" }, { "title": "Depth-first traversal" }, { "title": "In-order traversal" }, { "title": "Pre-order traversal" }, { "title": "Post-order traversal" }] },
+    { "title": "Graphs", "topics": [{ "title": "Directed graphs" }, { "title": "Undirected graphs" }, { "title": "Breadth-first search" }, { "title": "Depth-first search" }, { "title": "Dijkstra's algorithm" }, { "title": "Bellman-Ford algorithm" }, { "title": "Prim's algorithm" }, { "title": "Kruskal's algorithm" }] },
+    { "title": "Advanced Data Structures", "topics": [{ "title": "Trie" }, { "title": "Segment trees" }, { "title": "Fenwick trees" }, { "title": "Disjoint set (union-find)" }, { "title": "Suffix trees and arrays" }, { "title": "B/B+ trees" }, { "title": "Skip list" }, { "title": "ISAM" }, { "title": "2-3 trees" }] },
+    { "title": "Problem Solving Techniques", "topics": [{ "title": "Brute force" }, { "title": "Backtracking" }, { "title": "Greedy algorithms" }, { "title": "Randomized algorithms" }, { "title": "Divide and conquer" }, { "title": "Recursion" }, { "title": "Dynamic programming" }, { "title": "Two-pointer technique" }, { "title": "Sliding window technique" }, { "title": "Fast and slow pointers" }, { "title": "Cyclic sort" }, { "title": "Merge intervals" }, { "title": "Kth element" }, { "title": "Two heaps" }, { "title": "Island traversal" }, { "title": "A* algorithm" }] },
+    { "title": "Practice", "topics": [{ "title": "LeetCode", "kind": "recommended" }, { "title": "Edabit", "kind": "alternative" }] }
+  ]
+}

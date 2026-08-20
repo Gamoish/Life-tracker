@@ -4,7 +4,7 @@ import { startTransition, useActionState, useState } from "react";
 import { Badge, Button, Card, Disclosure, EmptyState, Input, TextButton } from "@/components/ui";
 import { IconAdd } from "@/components/icons";
 import { useToast } from "@/components/Toast";
-import { addHabit, setHabitActive, updateHabit, type FormState } from "./actions";
+import { addHabit, deleteHabit, setHabitActive, updateHabit, type FormState } from "./actions";
 import DayPicker, { WeekdayDots, formatScheduledDays } from "./DayPicker";
 import ColorPicker from "./HabitColor";
 import { HABIT_COLOR_BG, type HabitColor } from "./habit-color";
@@ -99,6 +99,22 @@ function HabitRow({ habit }: { habit: ManagedHabit }) {
             }
           >
             {habit.active ? "Archive" : "Restore"}
+          </TextButton>
+          <TextButton
+            data-testid="delete-habit"
+            className="text-warn hover:text-warn"
+            onClick={() => {
+              if (!window.confirm(`Delete “${habit.name}” and its check-off history? This cannot be undone.`)) {
+                return;
+              }
+
+              startTransition(async () => {
+                await deleteHabit(habit.id);
+                toast("Habit deleted", "neutral");
+              });
+            }}
+          >
+            Delete
           </TextButton>
         </div>
       </div>

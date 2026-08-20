@@ -455,6 +455,7 @@ export const appSettings = pgTable("app_settings", {
       a CHECK(id = 1) would work too but this is simpler for one guaranteed row. */
   id: integer("id").primaryKey().default(1),
   calorieGoal: integer("calorie_goal"),
+  lastBmi: real("last_bmi"),
   bottleSizeMl: integer("bottle_size_ml").notNull().default(500),
   dailyWaterGoalMl: integer("daily_water_goal_ml").notNull().default(2500),
   weightUnit: weightUnit("weight_unit").notNull().default("kg"),

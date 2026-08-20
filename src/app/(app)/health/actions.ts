@@ -19,6 +19,7 @@ import {
 import { computeSleepDuration } from "@/lib/sleep";
 import { fromDisplay, type WeightUnit } from "@/lib/weight-unit";
 import { today } from "@/lib/date";
+import { saveCalorieGoal, saveLastBmi } from "../settings/queries";
 
 const MEAL_TYPES: readonly MealType[] = ["breakfast", "lunch", "dinner", "snack"];
 
@@ -86,6 +87,24 @@ export async function logWeight(_prev: FormState, formData: FormData): Promise<F
   if (!Number.isFinite(n) || n <= 0) return { error: "Weight must be a positive number" };
 
   await upsertDailyHealth(today(), { steps: null, weightKg: fromDisplay(n, unit) });
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function saveBmi(_prev: FormState, formData: FormData): Promise<FormState> {
+  const bmi = Number(String(formData.get("bmi") ?? ""));
+  if (!Number.isFinite(bmi) || bmi <= 0 || bmi > 100) return { error: "Calculate a valid BMI first" };
+  await saveLastBmi(Math.round(bmi * 10) / 10);
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function saveCalorieRequirement(_prev: FormState, formData: FormData): Promise<FormState> {
+  const calories = Number(String(formData.get("calories") ?? ""));
+  if (!Number.isFinite(calories) || calories <= 0 || calories > 10000) {
+    return { error: "Calculate a valid calorie requirement first" };
+  }
+  await saveCalorieGoal(Math.round(calories));
   revalidateAll();
   return { ok: true };
 }

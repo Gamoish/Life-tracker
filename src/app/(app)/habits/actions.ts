@@ -90,3 +90,11 @@ export async function setHabitActive(id: number, active: boolean) {
   await db.update(habits).set({ active }).where(eq(habits.id, id));
   revalidateAll();
 }
+
+/** Permanently remove a habit. Its completion logs cascade with it in the database. */
+export async function deleteHabit(id: number) {
+  if (!Number.isInteger(id) || id < 1) return;
+
+  await db.delete(habits).where(eq(habits.id, id));
+  revalidateAll();
+}

@@ -25,7 +25,7 @@ export default function Sidebar({ dueTasks }: { dueTasks: DueTaskSummary[] }) {
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
           <SettingsLink />
-          <TaskBell items={dueTasks} />
+          <TaskBell items={dueTasks} placement="sidebar" />
         </div>
       </div>
 

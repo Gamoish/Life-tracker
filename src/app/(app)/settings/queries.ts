@@ -5,6 +5,7 @@ import type { WeightUnit } from "@/lib/weight-unit";
 
 export type Settings = {
   calorieGoal: number | null;
+  lastBmi: number | null;
   bottleSizeMl: number;
   dailyWaterGoalMl: number;
   weightUnit: WeightUnit;
@@ -14,6 +15,7 @@ export type Settings = {
     whenever no row has been saved yet, so reading never has to create one. */
 const DEFAULTS: Settings = {
   calorieGoal: null,
+  lastBmi: null,
   bottleSizeMl: 500,
   dailyWaterGoalMl: 2500,
   weightUnit: "kg",
@@ -28,6 +30,7 @@ export async function getSettings(): Promise<Settings> {
   const rows = await db
     .select({
       calorieGoal: appSettings.calorieGoal,
+      lastBmi: appSettings.lastBmi,
       bottleSizeMl: appSettings.bottleSizeMl,
       dailyWaterGoalMl: appSettings.dailyWaterGoalMl,
       weightUnit: appSettings.weightUnit,
@@ -42,6 +45,13 @@ export async function saveCalorieGoal(calorieGoal: number | null) {
     .insert(appSettings)
     .values({ id: 1, calorieGoal })
     .onConflictDoUpdate({ target: appSettings.id, set: { calorieGoal } });
+}
+
+export async function saveLastBmi(lastBmi: number) {
+  await db
+    .insert(appSettings)
+    .values({ id: 1, lastBmi })
+    .onConflictDoUpdate({ target: appSettings.id, set: { lastBmi } });
 }
 
 export async function saveWaterSettings(bottleSizeMl: number, dailyWaterGoalMl: number) {

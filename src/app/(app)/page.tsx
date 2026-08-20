@@ -21,12 +21,14 @@ import {
   listTransactions,
 } from "./expenses/queries";
 import HabitCheckList, { type HabitNode } from "./habits/HabitCheckList";
+import HomeCalendar from "./HomeCalendar";
 import { listHabitsWithLogs } from "./habits/queries";
 import HealthToday from "./health/HealthToday";
 import JournalToday from "./journal/JournalToday";
 import { getJournalEntry } from "./journal/queries";
 import { getSettings } from "./settings/queries";
 import { logout } from "../login/actions";
+import { listActiveTasks } from "./tasks/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +57,7 @@ export default async function TodayPage() {
     budgetStatus,
     settings,
     journalText,
+    tasks,
   ] = await Promise.all([
     listHabitsWithLogs(),
     db.select().from(goals).where(eq(goals.status, "active")).orderBy(asc(goals.id)),
@@ -67,6 +70,7 @@ export default async function TodayPage() {
     listCategoryBudgetStatus(monthStart, monthEnd),
     getSettings(),
     getJournalEntry(day),
+    listActiveTasks(),
   ]);
   const upcoming = mergeUpcoming(upcomingBills, upcomingEmis);
 
@@ -130,7 +134,7 @@ export default async function TodayPage() {
         }
       />
 
-      <dl className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+      <dl className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         <StatTile
           label="Habits"
           value={`${doneHabits}/${dueHabits.length}`}
@@ -153,10 +157,17 @@ export default async function TodayPage() {
           icon={<IconDroplet />}
         />
         <StatTile label="Calories" value={healthSummary.calories} icon={<IconFlame />} />
+        <StatTile
+          label="BMI"
+          value={settings.lastBmi?.toFixed(1) ?? "—"}
+          hint={settings.lastBmi === null ? "not calculated" : "latest calculation"}
+        />
       </dl>
 
       <SectionHeader title="Habits" right={<Link href="/habits">All habits →</Link>} />
       <HabitCheckList habits={checkList} today={day} emptyMessage="No habits due today" />
+
+      <section className="mt-8"><HomeCalendar tasks={tasks} today={day} /></section>
 
       <SectionHeader title="Health" className="mt-8" right={<Link href="/health">Log more →</Link>} />
       <HealthToday

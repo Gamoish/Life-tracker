@@ -16,6 +16,7 @@ import {
 } from "@/lib/health-queries";
 import { getSettings } from "../settings/queries";
 import HealthManager from "./HealthManager";
+import HealthCalculators from "./HealthCalculators";
 import HealthToday from "./HealthToday";
 
 export const dynamic = "force-dynamic";
@@ -106,6 +107,9 @@ export default async function HealthPage() {
         dailyWaterGoalMl={settings.dailyWaterGoalMl}
         weightUnit={settings.weightUnit}
       />
+
+      <SectionHeader title="Calculators" className="mt-8" />
+      <HealthCalculators weightKg={summary.weightKg} weightUnit={settings.weightUnit} />
 
       <SectionHeader title="Manage" className="mt-8" />
       <HealthManager

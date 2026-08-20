@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useActionState, useMemo, useOptimistic, useState } from "react";
+import { startTransition, useActionState, useOptimistic, useState } from "react";
 import {
   Button,
   Card,
@@ -11,14 +11,13 @@ import {
   Input,
   Pill,
   SectionHeader,
-  SegmentedControl,
   Select,
   TextButton,
   Textarea,
 } from "@/components/ui";
 import { IconAdd } from "@/components/icons";
 import { useToast } from "@/components/Toast";
-import { formatShort, monthBounds, weekBounds, yearBounds } from "@/lib/date";
+import { addDays, formatShort, weekBounds } from "@/lib/date";
 import { isDueOn, isOverdue, type TaskRecurrence } from "@/lib/task-schedule";
 import DayPicker, { formatScheduledDays } from "../habits/DayPicker";
 import {
@@ -31,30 +30,12 @@ import {
 } from "./actions";
 import type { TaskWithCompletions } from "./queries";
 
-const TABS = ["daily", "weekly", "monthly", "yearly"] as const;
-type Tab = (typeof TABS)[number];
-const TAB_LABEL: Record<Tab, string> = {
-  daily: "Daily",
-  weekly: "Weekly",
-  monthly: "Monthly",
-  yearly: "Yearly",
-};
 const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
 
-/** A one-off task belongs on a tab if its due date falls in that tab's current period. */
-function inTab(task: TaskWithCompletions, tab: Tab, today: string): boolean {
-  if (task.recurrence === tab) return true;
-  if (task.recurrence !== "one_off") return false;
-
-  const [start, end] =
-    tab === "daily"
-      ? [today, today]
-      : tab === "weekly"
-        ? weekBounds(today)
-        : tab === "monthly"
-          ? monthBounds(today)
-          : yearBounds(today);
-  return task.dueDate >= start && task.dueDate <= end;
+function occursInRange(task: TaskWithCompletions, start: string, end: string): boolean {
+  if (task.recurrence === "one_off") return task.dueDate >= start && task.dueDate <= end;
+  for (let day = start; day <= end; day = addDays(day, 1)) if (isDueOn(task, day)) return true;
+  return false;
 }
 
 type TaskStatus = { done: boolean; overdue: boolean; dueToday: boolean };
@@ -105,8 +86,6 @@ export default function TaskView({
   categories: string[];
   today: string;
 }) {
-  const [tab, setTab] = useState<Tab>("daily");
-
   const [optimistic, toggleLocally] = useOptimistic(
     tasks,
     (state: TaskWithCompletions[], id: number) =>
@@ -124,16 +103,22 @@ export default function TaskView({
       }),
   );
 
-  const visible = useMemo(() => {
-    const rows = optimistic
-      .filter((t) => inTab(t, tab, today))
-      .map((task) => ({ task, status: summarize(task, today) }));
-    // Overdue first, then still-due, then done — the ones needing action rise up.
+  const rowsFor = (start: string, end: string) => {
+    const rows = optimistic.filter((t) => occursInRange(t, start, end)).map((task) => ({ task, status: summarize(task, today) }));
     return rows.sort((a, b) => {
       const rank = (s: TaskStatus) => (s.overdue ? 0 : s.done ? 2 : 1);
       return rank(a.status) - rank(b.status) || a.task.dueDate.localeCompare(b.task.dueDate);
     });
-  }, [optimistic, tab, today]);
+  };
+
+  const [, weekEnd] = weekBounds(today);
+  const tomorrow = addDays(today, 1);
+  const nextWeekStart = addDays(weekEnd, 1);
+  const nextWeekEnd = addDays(nextWeekStart, 6);
+  const todayRows = rowsFor(today, today);
+  const thisWeekRows = tomorrow > weekEnd ? [] : rowsFor(tomorrow, weekEnd);
+  const nextWeekRows = rowsFor(nextWeekStart, nextWeekEnd);
+  const upcomingRows = optimistic.filter((t) => t.recurrence === "one_off" && t.dueDate > nextWeekEnd).map((task) => ({ task, status: summarize(task, today) }));
 
   function toggle(task: TaskWithCompletions) {
     startTransition(async () => {
@@ -146,38 +131,21 @@ export default function TaskView({
     <>
       <QuickAddBar />
 
-      <SectionHeader
-        title="Tasks"
-        right={<span className="font-mono text-xs">{visible.length} in view</span>}
-        className="mt-6"
-      />
-
-      <SegmentedControl
-        testId="task-tabs"
-        ariaLabel="Task view"
-        value={tab}
-        onChange={(v) => setTab(v as Tab)}
-        options={TABS.map((t) => ({ value: t, label: TAB_LABEL[t] }))}
-        className="mb-4"
-      />
-
-      {visible.length === 0 ? (
-        <EmptyState
-          icon={<IconAdd />}
-          title={`Nothing on ${TAB_LABEL[tab]}`}
-          hint="Add a task above, or switch tabs."
-        />
-      ) : (
-        <ul className="space-y-2">
-          {visible.map(({ task, status }) => (
-            <TaskRow key={task.id} task={task} status={status} onToggle={() => toggle(task)} />
-          ))}
-        </ul>
-      )}
+      <SectionHeader title="Plan" right={<span className="font-mono text-xs">{todayRows.length} today</span>} className="mt-6" />
+      <div className="grid gap-4 xl:grid-cols-3">
+        <TaskColumn title="Today" subtitle={formatShort(today)} rows={todayRows} onToggle={toggle} />
+        <TaskColumn title="This week" subtitle={`${formatShort(tomorrow)} – ${formatShort(weekEnd)}`} rows={thisWeekRows} onToggle={toggle} />
+        <TaskColumn title="Next week" subtitle={`${formatShort(nextWeekStart)} – ${formatShort(nextWeekEnd)}`} rows={nextWeekRows} onToggle={toggle} />
+      </div>
+      <TaskColumn title="Upcoming" subtitle="Later one-off tasks" rows={upcomingRows} onToggle={toggle} className="mt-6" />
 
       <AddTaskForm categories={categories} today={today} className="mt-6" />
     </>
   );
+}
+
+function TaskColumn({ title, subtitle, rows, onToggle, className = "" }: { title: string; subtitle: string; rows: { task: TaskWithCompletions; status: TaskStatus }[]; onToggle: (task: TaskWithCompletions) => void; className?: string }) {
+  return <section className={`min-w-0 rounded-card border border-line bg-surface/50 p-3 ${className}`}><header className="mb-3 border-b border-line pb-2"><h2 className="font-display text-sm font-semibold tracking-tight">{title}</h2><p className="font-mono text-2xs text-faint">{subtitle}</p></header>{rows.length === 0 ? <p className="py-4 text-center text-xs text-faint">No tasks planned</p> : <ul className="space-y-2">{rows.map(({ task, status }) => <TaskRow key={task.id} task={task} status={status} onToggle={() => onToggle(task)} />)}</ul>}</section>;
 }
 
 function QuickAddBar() {

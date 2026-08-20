@@ -23,9 +23,12 @@ import type { DueTaskSummary } from "./queries";
 export default function TaskBell({
   items,
   className = "",
+  placement = "default",
 }: {
   items: DueTaskSummary[];
   className?: string;
+  /** The sidebar is narrower than the standard notification tray. */
+  placement?: "default" | "sidebar";
 }) {
   const [open, setOpen] = useState(false);
   const overdueCount = items.filter((t) => t.overdue).length;
@@ -72,7 +75,11 @@ export default function TaskBell({
           />
           <div
             data-testid="task-bell-panel"
-            className="absolute right-0 top-full z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-card border border-line bg-gradient-to-b from-raised/80 to-surface p-3 shadow-[0_20px_44px_-20px_rgba(0,0,0,0.7)]"
+            className={`absolute right-0 top-full z-40 mt-2 max-w-[calc(100vw-2rem)] rounded-card border border-line bg-gradient-to-b from-raised/80 to-surface p-3 shadow-[0_20px_44px_-20px_rgba(0,0,0,0.7)] ${
+              placement === "sidebar"
+                ? "w-[calc(15rem-2.5rem)] lg:w-[calc(16rem-2.5rem)]"
+                : "w-80"
+            }`}
           >
             <div className="mb-2 flex items-center justify-between">
               <p className="font-display text-sm font-semibold tracking-tight">Due &amp; overdue</p>

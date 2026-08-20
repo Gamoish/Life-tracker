@@ -1,0 +1,15 @@
+{
+  "slug": "java",
+  "name": "Java",
+  "groups": [
+    { "title": "Learn the Basics", "topics": [{ "title": "Basic syntax" }, { "title": "Data types" }, { "title": "Variables and scopes" }, { "title": "Conditionals" }, { "title": "Loops" }, { "title": "Arrays" }, { "title": "Strings and methods" }, { "title": "Type casting" }, { "title": "Math operations" }, { "title": "Program lifecycle" }] },
+    { "title": "Object-Oriented Programming", "topics": [{ "title": "Classes and objects" }, { "title": "Attributes and methods" }, { "title": "Access specifiers" }, { "title": "Static keyword" }, { "title": "Nested classes" }, { "title": "Abstraction" }, { "title": "Inheritance" }, { "title": "Encapsulation" }, { "title": "Interfaces" }, { "title": "Method overloading and overriding" }, { "title": "Static vs dynamic binding" }, { "title": "Object lifecycle" }, { "title": "Records" }, { "title": "Enums" }, { "title": "Final keyword" }] },
+    { "title": "Core Language Features", "topics": [{ "title": "Packages" }, { "title": "Initializer blocks" }, { "title": "Pass by value" }, { "title": "Annotations" }, { "title": "Lambda expressions" }, { "title": "Modules" }, { "title": "Regular expressions" }, { "title": "Date and time" }, { "title": "Cryptography" }] },
+    { "title": "Collections & Errors", "topics": [{ "title": "Array vs ArrayList" }, { "title": "Set" }, { "title": "Map" }, { "title": "Queue" }, { "title": "Stack" }, { "title": "Deque" }, { "title": "Iterator" }, { "title": "Generic collections" }, { "title": "Optionals" }, { "title": "Exception handling" }] },
+    { "title": "Build, I/O & Concurrency", "topics": [{ "title": "Maven", "kind": "recommended" }, { "title": "Gradle", "kind": "alternative" }, { "title": "Bazel", "kind": "alternative" }, { "title": "Dependency injection" }, { "title": "File operations" }, { "title": "Networking" }, { "title": "Threads" }, { "title": "Virtual threads" }, { "title": "Java memory model" }, { "title": "volatile keyword" }] },
+    { "title": "Functional Programming", "topics": [{ "title": "Functional composition" }, { "title": "Higher-order functions" }, { "title": "Functional interfaces" }, { "title": "Stream API" }] },
+    { "title": "Database Access", "topics": [{ "title": "JDBC" }, { "title": "Spring Data JPA", "kind": "recommended" }, { "title": "Hibernate", "kind": "recommended" }, { "title": "EBean", "kind": "alternative" }] },
+    { "title": "Web Frameworks", "topics": [{ "title": "Spring Boot", "kind": "recommended" }, { "title": "Quarkus", "kind": "alternative" }, { "title": "Play Framework", "kind": "alternative" }, { "title": "Javalin", "kind": "alternative" }] },
+    { "title": "Logging & Testing", "topics": [{ "title": "SLF4J", "kind": "recommended" }, { "title": "Logback", "kind": "recommended" }, { "title": "Log4j2", "kind": "alternative" }, { "title": "TinyLog", "kind": "alternative" }, { "title": "JUnit", "kind": "recommended" }, { "title": "TestNG", "kind": "alternative" }, { "title": "REST Assured" }, { "title": "JMeter" }, { "title": "Cucumber-JVM" }, { "title": "Mockito", "kind": "recommended" }] }
+  ]
+}

@@ -1,8 +1,9 @@
 import BottomNav from "@/components/BottomNav";
+import DayRollover from "@/components/DayRollover";
 import MobileTopBar from "@/components/MobileTopBar";
 import Sidebar from "@/components/Sidebar";
 import { ToastProvider } from "@/components/Toast";
-import { today } from "@/lib/date";
+import { APP_TIMEZONE, today } from "@/lib/date";
 import { listActiveTasks, summarizeDueTasks } from "./tasks/queries";
 
 /**
@@ -33,6 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <ToastProvider>
+      <DayRollover timeZone={APP_TIMEZONE} />
       <div className="md:grid md:grid-cols-[15rem_minmax(0,1fr)] lg:grid-cols-[16rem_minmax(0,1fr)]">
         <Sidebar dueTasks={dueTasks} />
         <main className="mx-auto w-full max-w-7xl px-5 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-[calc(4.5rem+env(safe-area-inset-top))] md:px-8 md:pb-16 md:pt-10 lg:px-12">
