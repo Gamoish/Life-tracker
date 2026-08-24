@@ -16,6 +16,7 @@ import path from "node:path";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { roadmaps, roadmapTopics } from "../src/db/schema.js";
+import { sslConfigFor } from "../src/db/ssl.js";
 
 type TopicKind = "core" | "recommended" | "alternative" | "optional";
 
@@ -49,7 +50,7 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const pool = new Pool({ connectionString, max: 1 });
+const pool = new Pool({ connectionString, max: 1, ssl: sslConfigFor(connectionString) });
 const db = drizzle(pool);
 
 async function seedFile(file: string) {

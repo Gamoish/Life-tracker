@@ -60,7 +60,7 @@ export default function WeightChart({
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
-          className="stroke-accent drop-shadow-[0_0_4px_rgba(247,138,4,0.5)]"
+          className="stroke-accent drop-shadow-[0_0_4px_rgba(231,164,75,0.5)]"
         />
         {coords.map(([x, y], i) => (
           <circle key={i} cx={x} cy={y} r={2.5} className="fill-accent" />

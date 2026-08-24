@@ -76,7 +76,7 @@ export const HABIT_COLOR_BORDER: Record<HabitColor, string> = {
  * is how a hovered card reads as "lifted", tinted to that habit specifically.
  */
 export const HABIT_COLOR_GLOW: Record<HabitColor, string> = {
-  accent: "hover:shadow-[0_14px_32px_-14px_rgba(247,138,4,0.5)]",
+  accent: "hover:shadow-[0_14px_32px_-14px_rgba(231,164,75,0.5)]",
   rose: "hover:shadow-[0_14px_32px_-14px_rgba(251,113,133,0.5)]",
   amber: "hover:shadow-[0_14px_32px_-14px_rgba(251,191,36,0.5)]",
   green: "hover:shadow-[0_14px_32px_-14px_rgba(74,222,128,0.5)]",

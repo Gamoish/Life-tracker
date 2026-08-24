@@ -1,4 +1,5 @@
 import BottomNav from "@/components/BottomNav";
+import CommandPalette from "@/components/CommandPalette";
 import DayRollover from "@/components/DayRollover";
 import MobileTopBar from "@/components/MobileTopBar";
 import Sidebar from "@/components/Sidebar";
@@ -43,6 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </div>
       <MobileTopBar dueTasks={dueTasks} />
       <BottomNav />
+      <CommandPalette />
     </ToastProvider>
   );
 }

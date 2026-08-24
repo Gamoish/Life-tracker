@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Sans, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 
 /**
  * Three type roles, three faces. `next/font` downloads and self-hosts them at
@@ -8,11 +8,12 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
  * Each exposes a CSS variable that `globals.css` maps onto a Tailwind font
  * token, so components say `font-display` / `font-mono`, never a family name.
  *
- *   display  Space Grotesk — headings only, used with restraint
- *   sans     Inter         — everything you actually read
+ *   display  Space Grotesk  — headings only, used with restraint
+ *   sans     IBM Plex Sans  — everything you actually read
  *   mono     JetBrains Mono — every number: counts, streaks, tallies, dates
  *
- * All three are variable fonts, so one file covers the whole weight range.
+ * Space Grotesk and JetBrains Mono are variable fonts; IBM Plex Sans isn't on
+ * Google Fonts, so it's pinned to the four weights actually used in the app.
  */
 
 export const displayFont = Space_Grotesk({
@@ -21,8 +22,9 @@ export const displayFont = Space_Grotesk({
   display: "swap",
 });
 
-export const sansFont = Inter({
+export const sansFont = IBM_Plex_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--f-sans",
   display: "swap",
 });

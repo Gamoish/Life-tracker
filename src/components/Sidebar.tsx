@@ -2,7 +2,9 @@ import { formatShort, today } from "@/lib/date";
 import TaskBell from "@/app/(app)/tasks/TaskBell";
 import type { DueTaskSummary } from "@/app/(app)/tasks/queries";
 import SettingsLink from "@/app/(app)/settings/SettingsLink";
+import { CommandPaletteButton } from "./CommandPalette";
 import SidebarNav from "./SidebarNav";
+import ThemeToggle from "./ThemeToggle";
 import TodayGlance from "./TodayGlance";
 
 /**
@@ -29,10 +31,15 @@ export default function Sidebar({ dueTasks }: { dueTasks: DueTaskSummary[] }) {
         </div>
       </div>
 
+      <CommandPaletteButton />
+
       <SidebarNav />
 
       <div className="mt-auto border-t border-line px-5 py-5">
         <TodayGlance />
+      </div>
+      <div className="px-5 pb-5">
+        <ThemeToggle className="w-full" />
       </div>
     </aside>
   );
@@ -44,7 +51,7 @@ function Mark() {
   return (
     <span
       aria-hidden
-      className="grid shrink-0 grid-cols-3 gap-[2px] rounded-md border border-line bg-canvas p-1 shadow-[0_0_18px_-5px_rgba(247,138,4,0.6)]"
+      className="grid shrink-0 grid-cols-3 gap-[2px] rounded-md border border-line bg-canvas p-1 shadow-[0_0_18px_-5px_rgba(231,164,75,0.6)]"
     >
       {lit.map((level, i) => (
         <span

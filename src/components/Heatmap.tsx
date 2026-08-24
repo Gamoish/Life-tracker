@@ -89,7 +89,7 @@ export default function Heatmap({
                         key={day.date}
                         title={`${day.count === 0 ? "Nothing" : day.count} on ${formatShort(day.date)}`}
                         className={`h-3 w-3 rounded-[3px] ring-1 ring-inset ring-line/40 transition-all hover:scale-125 hover:ring-ink/60 ${LEVEL_CLASS[day.level]} ${
-                          day.level === 4 ? "shadow-[0_0_8px_-1px_rgba(247,138,4,0.8)]" : ""
+                          day.level === 4 ? "shadow-[0_0_8px_-1px_rgba(231,164,75,0.8)]" : ""
                         }`}
                       />
                     ),

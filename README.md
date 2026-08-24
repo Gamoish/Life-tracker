@@ -81,6 +81,89 @@ Two details worth knowing:
 
 Tap **Lock** on the Today screen to clear the session.
 
+This scheme needs no code changes on Vercel: the session is a stateless
+signed JWT the client holds (nothing server-side to persist between
+invocations), `src/middleware.ts` runs fine on Vercel's Edge runtime (`jose`
+is WebCrypto-only, no `node:*` imports), and the password check
+(`src/lib/password.ts`, which does use `node:crypto`) runs in the login
+server action's Node.js serverless function, not on the Edge — so
+`timingSafeEqual` is available there. The only thing to actually set is
+`COOKIE_SECURE=true` in Vercel's environment variables (see
+[Deploying to Vercel + Supabase](#deploying-to-vercel--supabase)), since
+Vercel always serves over HTTPS.
+
+## Deploying to Vercel + Supabase
+
+The app also runs on Vercel (hosting) + Supabase (managed Postgres) instead of
+self-hosted Docker Postgres — the same code, same `DATABASE_URL`-driven
+connection, just pointed at a different database. Docker Compose keeps working
+for local dev either way; this is an additional target, not a replacement.
+
+**1. Create a Supabase project and grab the connection string**
+
+In the Supabase dashboard: **Project Settings → Database → Connection string**.
+Use the pooled **"Transaction" mode** connection string (port `6543`, host
+starting `aws-0-…pooler.supabase.com`), not the direct connection (port
+`5432`). Vercel runs your app as short-lived serverless functions that can
+open many connections at once; the direct connection has a low connection
+cap and exhausts fast under concurrent requests, while the pooler
+(Supavisor) is built exactly for this. Copy it — it looks like:
+
+```
+postgresql://postgres.xxxxxxxxxxxx:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:6543/postgres
+```
+
+**2. Push the schema to Supabase**
+
+With that connection string as `DATABASE_URL` (either export it inline, or
+temporarily set it in your local `.env`):
+
+```bash
+DATABASE_URL="postgresql://postgres.xxxx:...@aws-0-<region>.pooler.supabase.com:6543/postgres" npx drizzle-kit push
+```
+
+SSL is picked up automatically — `drizzle.config.ts` reads `DATABASE_URL` and
+enables it for any non-local host, so no `?sslmode=require` needs to be typed
+into the string by hand. This creates every table from `src/db/schema.ts`
+directly (no migration history needed for a first push to a fresh database).
+If you'd rather apply the tracked migration files instead, run
+`DATABASE_URL="..." npm run db:migrate`. Optionally seed the roadmaps the same
+way: `DATABASE_URL="..." npm run seed:roadmaps`.
+
+**3. Push the repo to GitHub** (if it isn't already on a remote)
+
+```bash
+git push -u origin main
+```
+
+**4. Import into Vercel**
+
+[vercel.com/new](https://vercel.com/new) → import the GitHub repo. Vercel
+detects Next.js automatically — no build command or output directory changes
+needed. Before deploying, add every variable from `.env.example` marked
+`[Vercel]` under **Project Settings → Environment Variables**:
+
+| Variable         | Value                                                             |
+| ---------------- | ------------------------------------------------------------------ |
+| `DATABASE_URL`   | The Supabase pooled connection string from step 1                |
+| `APP_PASSWORD`   | Your chosen login password                                       |
+| `SESSION_SECRET` | A long random string (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
+| `APP_TIMEZONE`   | Your IANA zone, e.g. `Asia/Kolkata`                               |
+| `COOKIE_SECURE`  | `true` — Vercel always serves over HTTPS                          |
+
+`DATABASE_SSL` does not need to be set — it's only an escape hatch for when
+the automatic local-vs-remote SSL detection guesses wrong.
+
+**5. Deploy**
+
+Trigger the deploy from the Vercel import screen (or `git push` again later
+for subsequent deploys). Every push to the connected branch redeploys
+automatically.
+
+**6. (Optional) Attach a custom domain**
+
+**Project Settings → Domains** in the Vercel dashboard.
+
 ## Day-to-day
 
 ```bash

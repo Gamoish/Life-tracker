@@ -3,12 +3,12 @@
 /* ---------------------------------------------------------------------------
  * Theme contract.
  *
- * The app is dark, full stop — there is no light theme and no toggle. The
- * indirection is kept anyway: `@theme inline` means the generated utilities
- * compile to `var(--c-…)` at the point of use rather than baking a literal hex
- * in, so the entire palette is swappable from this one block. Adding a second
- * theme later is a `.light { --c-…: … }` block plus a class on <html>; nothing
- * in any component would have to change.
+ * Dark is the default and lives on plain `:root`; `:root[data-theme="light"]`
+ * below overrides the same `--c-…` custom properties for the light theme.
+ * `@theme inline` means the generated utilities compile to `var(--c-…)` at the
+ * point of use rather than baking a literal hex in, so both palettes work with
+ * zero per-component changes — see `ThemeToggle`/`theme-client.ts` for how the
+ * attribute gets set and persisted.
  *
  * Never hand-colour a component — reach for a token, or add one here.
  *
@@ -81,9 +81,9 @@
 }
 
 /* ---------------------------------------------------------------------------
- * True black canvas, with surfaces lifted off it in small steps and separated
- * by borders rather than shadows — a shadow on #000 is invisible, a 1px line
- * is not.
+ * Warm graphite canvas (dark, default) with surfaces lifted off it in small
+ * steps and separated by borders rather than shadows — a shadow barely reads
+ * on a near-black surface, a 1px line always does.
  *
  * Every foreground tone below clears 4.5:1 against both the canvas and the
  * card surface, so small text is legible wherever it lands.
@@ -91,28 +91,28 @@
 :root {
   color-scheme: dark;
 
-  --c-canvas: #000000;
-  --c-surface: #0d0f14;
-  --c-raised: #171b22;
-  --c-line: #222831;
-  --c-line-strong: #39414e;
+  --c-canvas: #151318;
+  --c-surface: #1e1c26;
+  --c-raised: #262230;
+  --c-line: #322e3c;
+  --c-line-strong: #423d4f;
 
-  --c-ink: #e6e9ef;
-  --c-muted: #9aa5b8;
-  --c-faint: #78849b;
+  --c-ink: #eceaf1;
+  --c-muted: #a39daf;
+  --c-faint: #6d6779;
 
-  --c-accent: #f78a04;
-  --c-accent-soft: #241703;
-  --c-accent-ink: #000000;
+  --c-accent: #e7a44b;
+  --c-accent-soft: rgba(231, 164, 75, 0.15);
+  --c-accent-ink: #241704;
 
-  --c-done: #54cb7e;
-  --c-done-soft: #06180f;
-  --c-wip: #5ab8f0;
-  --c-wip-soft: #061826;
-  --c-warn: #f2657f;
-  --c-warn-soft: #250f16;
+  --c-done: #5cc08a;
+  --c-done-soft: rgba(92, 192, 138, 0.15);
+  --c-wip: #6fa8e6;
+  --c-wip-soft: rgba(111, 168, 230, 0.15);
+  --c-warn: #e5605e;
+  --c-warn-soft: rgba(229, 96, 94, 0.15);
   --c-idle: #8b96aa;
-  --c-idle-soft: #171b22;
+  --c-idle-soft: #262230;
 
   --c-habit-rose: #fb7185;
   --c-habit-amber: #fbbf24;
@@ -122,11 +122,45 @@
   --c-habit-violet: #a78bfa;
   --c-habit-pink: #f472b6;
 
-  --c-heat-0: #0f1218;
-  --c-heat-1: #4e2e06;
-  --c-heat-2: #8a5008;
-  --c-heat-3: #c4700a;
-  --c-heat-4: #f78a04;
+  --c-heat-0: #211e2a;
+  --c-heat-1: #4a3a1e;
+  --c-heat-2: #7c5b23;
+  --c-heat-3: #b27e2c;
+  --c-heat-4: #e7a44b;
+}
+
+/* ---- LIGHT — authored separately, not a filter over dark -------------- */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --c-canvas: #f3f1ec;
+  --c-surface: #ffffff;
+  --c-raised: #f7f5f0;
+  --c-line: #e4e0d7;
+  --c-line-strong: #d4cfc3;
+
+  --c-ink: #221f27;
+  --c-muted: #6a6473;
+  --c-faint: #9a94a2;
+
+  --c-accent: #e19a34;
+  --c-accent-soft: rgba(225, 154, 52, 0.16);
+  --c-accent-ink: #2a1b04;
+
+  --c-done: #3ba46a;
+  --c-done-soft: rgba(59, 164, 106, 0.14);
+  --c-wip: #3d7fc4;
+  --c-wip-soft: rgba(61, 127, 196, 0.13);
+  --c-warn: #d5433f;
+  --c-warn-soft: rgba(213, 67, 63, 0.13);
+  --c-idle: #8a8390;
+  --c-idle-soft: #f0ede6;
+
+  --c-heat-0: #e7e3da;
+  --c-heat-1: #f0d9ae;
+  --c-heat-2: #e7b96b;
+  --c-heat-3: #e19a34;
+  --c-heat-4: #b5730f;
 }
 
 @layer base {
@@ -140,14 +174,22 @@
     overscroll-behavior-y: none;
     /* Ambient light rather than a flat void — two soft, fixed glows bleeding
        in from off-screen. Same reasoning as the heatmap's own colour: a
-       shadow on true black is invisible, but a low-opacity glow reads
-       clearly. Kept faint enough to never compete with foreground content,
-       and `fixed` so it doesn't repeat or drift as the page scrolls. */
+       shadow on a near-black surface barely reads, but a low-opacity glow
+       reads clearly. Kept faint enough to never compete with foreground
+       content, and `fixed` so it doesn't repeat or drift as the page scrolls. */
     background-image:
-      radial-gradient(1100px 640px at 12% -12%, rgba(247, 138, 4, 0.09), transparent 60%),
-      radial-gradient(900px 560px at 108% 0%, rgba(90, 184, 240, 0.06), transparent 60%);
+      radial-gradient(1100px 640px at 12% -12%, rgba(231, 164, 75, 0.09), transparent 60%),
+      radial-gradient(900px 560px at 108% 0%, rgba(111, 168, 230, 0.06), transparent 60%);
     background-repeat: no-repeat;
     background-attachment: fixed;
+  }
+
+  /* Same glow, much fainter — warm paper instead of a void, so it wants less
+     help staying legible. */
+  :root[data-theme="light"] body {
+    background-image:
+      radial-gradient(1100px 640px at 12% -12%, rgba(225, 154, 52, 0.05), transparent 60%),
+      radial-gradient(900px 560px at 108% 0%, rgba(61, 127, 196, 0.04), transparent 60%);
   }
 
   ::selection {

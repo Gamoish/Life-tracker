@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button, Card, Field, Input, Select } from "@/components/ui";
+import ThemeToggle from "@/components/ThemeToggle";
 import type { WeightUnit } from "@/lib/weight-unit";
 import { saveSettings, saveWater, saveWeight, type FormState } from "./actions";
 import type { Settings } from "./queries";
@@ -16,6 +17,14 @@ export default function SettingsView({ settings }: { settings: Settings }) {
         dailyWaterGoalMl={settings.dailyWaterGoalMl}
       />
       <WeightSettingsCard weightUnit={settings.weightUnit} />
+
+      <Card className="flex items-center justify-between gap-4 p-4">
+        <div>
+          <h3 className="mb-1 font-display text-sm font-semibold tracking-tight">Appearance</h3>
+          <p className="text-xs text-muted">Switch between the dark and light theme.</p>
+        </div>
+        <ThemeToggle />
+      </Card>
 
       <Card className="p-4">
         <h3 className="mb-1 font-display text-sm font-semibold tracking-tight">Export data</h3>

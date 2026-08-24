@@ -401,7 +401,7 @@ const BUTTON_VARIANT = {
   // black, so this is what gives the one interactive accent any presence at
   // all before the pointer arrives. Hover deepens it.
   primary:
-    "bg-accent text-accent-ink shadow-[0_4px_16px_-4px_rgba(247,138,4,0.45)] hover:opacity-90 hover:shadow-[0_6px_22px_-4px_rgba(247,138,4,0.6)]",
+    "bg-accent text-accent-ink shadow-[0_4px_16px_-4px_rgba(231,164,75,0.45)] hover:opacity-90 hover:shadow-[0_6px_22px_-4px_rgba(231,164,75,0.6)]",
   secondary:
     "border border-line bg-surface text-ink hover:border-line-strong hover:bg-raised",
   ghost: "text-muted hover:bg-raised hover:text-ink",

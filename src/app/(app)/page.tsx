@@ -196,7 +196,7 @@ export default async function TodayPage() {
             <li key={g.id}>
               <Link
                 href="/goals"
-                className="block rounded-card border border-line bg-gradient-to-b from-raised/60 to-surface p-3.5 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_14px_32px_-16px_rgba(247,138,4,0.4)]"
+                className="block rounded-card border border-line bg-gradient-to-b from-raised/60 to-surface p-3.5 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[0_14px_32px_-16px_rgba(231,164,75,0.4)]"
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="min-w-0 truncate text-sm font-medium">{g.title}</p>

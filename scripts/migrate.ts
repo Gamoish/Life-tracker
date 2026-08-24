@@ -2,6 +2,7 @@ import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
+import { sslConfigFor } from "../src/db/ssl.js";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -9,7 +10,7 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const pool = new Pool({ connectionString, max: 1 });
+const pool = new Pool({ connectionString, max: 1, ssl: sslConfigFor(connectionString) });
 
 try {
   await migrate(drizzle(pool), { migrationsFolder: "./drizzle" });
