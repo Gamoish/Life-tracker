@@ -9,18 +9,10 @@ import { istToday, sql } from "./db";
  * rows it added instead.
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
 const uniq = (label: string) => `E2E ${label} ${Math.random().toString(36).slice(2, 8)}`;
 
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
-
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  await page.goto("/");
 });
 
 test("a bottle tap and a custom amount both add to today's water total and persist", async ({ page }) => {

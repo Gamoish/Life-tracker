@@ -13,16 +13,8 @@ import { cleanup, istToday, sql } from "./db";
  * re-deriving that matrix against the live clock.
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
 const uniq = (label: string) => `E2E ${label} ${Math.random().toString(36).slice(2, 8)}`;
 type Tab = "daily" | "weekly" | "monthly" | "yearly";
-
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
 
 const taskRow = (page: Page, title: string) =>
   page.locator(`[data-testid="task-row"][data-title="${title}"]`);
@@ -74,13 +66,13 @@ async function addTaskViaForm(
   await page.waitForLoadState("networkidle");
 }
 
-test.beforeEach(async ({ page }) => {
-  await login(page);
-});
-
 test.afterAll(async () => {
   await cleanup();
   await sql("delete from tasks where title like 'E2E %'");
+});
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
 });
 
 test("a one-off task due today appears on the Daily tab and can be checked off", async ({ page }) => {

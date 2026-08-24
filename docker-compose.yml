@@ -26,10 +26,7 @@ services:
     environment:
       # Inside the compose network the database host is the service name, `db`.
       DATABASE_URL: postgres://${POSTGRES_USER:-tracker}:${POSTGRES_PASSWORD:-tracker}@db:5432/${POSTGRES_DB:-tracker}
-      APP_PASSWORD: ${APP_PASSWORD:?set APP_PASSWORD in .env}
-      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
       APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
-      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     ports:
       - "3000:3000"
 

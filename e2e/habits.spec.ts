@@ -16,17 +16,9 @@ import { cleanup, isoWeekdayOf, istToday, sql } from "./db";
  * clock, which would only make the suite more fragile for no extra coverage.
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
 const uniq = (label: string) => `E2E ${label} ${Math.random().toString(36).slice(2, 8)}`;
 
 const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
-
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
 
 const habitRow = (page: Page, name: string) =>
   page.locator(`[data-testid="habit-row"][data-name="${name}"]`);
@@ -79,12 +71,12 @@ async function seedDays(habitId: number, dates: string[]) {
   }
 }
 
-test.beforeEach(async ({ page }) => {
-  await login(page);
-});
-
 test.afterAll(async () => {
   await cleanup();
+});
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
 });
 
 test("streak counts consecutive scheduled days, and an unchecked-but-due today does not break it", async ({

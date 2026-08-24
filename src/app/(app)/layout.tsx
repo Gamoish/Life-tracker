@@ -8,9 +8,8 @@ import { APP_TIMEZONE, today } from "@/lib/date";
 import { listActiveTasks, summarizeDueTasks } from "./tasks/queries";
 
 /**
- * Wraps every authenticated screen. `/login` sits outside this route group so
- * it renders without the shell. The `(app)` group name is parenthesised, so it
- * does not appear in any URL — `/` is still Home.
+ * Wraps every screen. The `(app)` group name is parenthesised, so it does not
+ * appear in any URL — `/` is still Home.
  *
  * ONE tree drives both breakpoints:
  *   md+     a persistent sidebar in the first grid column, no tab bar

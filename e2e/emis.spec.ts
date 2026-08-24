@@ -8,15 +8,7 @@ import { istToday, sql } from "./db";
  * same triple-effect shape as `markBillPaid`, but with an end (tenure).
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
 const uniq = (label: string) => `E2E ${label} ${Math.random().toString(36).slice(2, 8)}`;
-
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
 
 async function setTab(page: Page, tab: "emis" | "accounts") {
   await page.getByTestId("expense-tabs").locator(`[data-value="${tab}"]`).click();
@@ -37,7 +29,7 @@ async function addAccount(page: Page, name: string) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  await page.goto("/");
 });
 
 test("an EMI added mid-tenure shows the right progress and remaining amount", async ({ page }) => {

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 /**
  * Mobile nav cleanup: the notification bell moved out of the bottom bar into
@@ -8,19 +8,10 @@ import { expect, test, type Page } from "@playwright/test";
  * `MobileTopBar` and the reduced `BottomNav` are `md:hidden`.
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
-
 test.use({ viewport: { width: 390, height: 844 } });
 
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
-
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  await page.goto("/");
 });
 
 test("the bottom bar shows exactly the primary four plus More, icon-only, and the bell lives in the top bar instead", async ({

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { istToday, sql } from "./db";
 
 /**
@@ -6,17 +6,8 @@ import { istToday, sql } from "./db";
  * Today-embedded widget's "History →" link, so every test starts from "/".
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
-
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
-
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  await page.goto("/");
 });
 
 test("today's entry saves from the Today widget, persists, and shows in history — editable there too", async ({

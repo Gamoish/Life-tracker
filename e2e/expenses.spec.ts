@@ -11,15 +11,7 @@ import { istToday, sql } from "./db";
  * AND the Today page's widget, which must both agree with it.
  */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
 const uniq = (label: string) => `E2E ${label} ${Math.random().toString(36).slice(2, 8)}`;
-
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
 
 async function setTab(
   page: Page,
@@ -75,7 +67,7 @@ async function addTransaction(
 }
 
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  await page.goto("/");
 });
 
 test("an income and an expense transaction update the account balance correctly, everywhere", async ({

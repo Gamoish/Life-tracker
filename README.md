@@ -29,18 +29,11 @@ cloud, no third-party sync.
 cp .env.example .env
 ```
 
-Then edit two values that actually matter:
+Then edit the one value that actually matters:
 
-- `APP_PASSWORD` — the single password you type on the login page.
 - `APP_TIMEZONE` — your IANA zone (`Asia/Kolkata`, `Europe/London`, …). This
   decides what "today" means for every habit, health and DSA log. Leave it at
   `UTC` and a 11pm entry may land on the wrong day.
-
-Generate a strong `SESSION_SECRET` with:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
 
 **2. Build and start the stack**
 
@@ -63,34 +56,6 @@ docker compose exec web npm run seed:roadmaps
 ```
 
 Open <http://localhost:3000>.
-
-## Auth
-
-There is no `users` table. One password lives in `APP_PASSWORD`; the login page
-checks it and sets a signed, httpOnly session cookie (HS256 via `jose`, 30-day
-expiry). `src/middleware.ts` gates every route except `/login` and the PWA files
-— the service worker and manifest stay public, or installing the app breaks.
-
-Two details worth knowing:
-
-- **`COOKIE_SECURE` defaults to `false`.** You'll open this over plain
-  `http://` on your LAN from your phone, and a `Secure` cookie would never be
-  sent. Set it to `true` only once you put the app behind HTTPS.
-- **The password comparison is constant-time** (`node:crypto.timingSafeEqual`
-  over SHA-256 digests of both sides, so buffer lengths always match).
-
-Tap **Lock** on the Today screen to clear the session.
-
-This scheme needs no code changes on Vercel: the session is a stateless
-signed JWT the client holds (nothing server-side to persist between
-invocations), `src/middleware.ts` runs fine on Vercel's Edge runtime (`jose`
-is WebCrypto-only, no `node:*` imports), and the password check
-(`src/lib/password.ts`, which does use `node:crypto`) runs in the login
-server action's Node.js serverless function, not on the Edge — so
-`timingSafeEqual` is available there. The only thing to actually set is
-`COOKIE_SECURE=true` in Vercel's environment variables (see
-[Deploying to Vercel + Supabase](#deploying-to-vercel--supabase)), since
-Vercel always serves over HTTPS.
 
 ## Deploying to Vercel + Supabase
 
@@ -146,10 +111,7 @@ needed. Before deploying, add every variable from `.env.example` marked
 | Variable         | Value                                                             |
 | ---------------- | ------------------------------------------------------------------ |
 | `DATABASE_URL`   | The Supabase pooled connection string from step 1                |
-| `APP_PASSWORD`   | Your chosen login password                                       |
-| `SESSION_SECRET` | A long random string (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
 | `APP_TIMEZONE`   | Your IANA zone, e.g. `Asia/Kolkata`                               |
-| `COOKIE_SECURE`  | `true` — Vercel always serves over HTTPS                          |
 
 `DATABASE_SSL` does not need to be set — it's only an escape hatch for when
 the automatic local-vs-remote SSL detection guesses wrong.
@@ -272,8 +234,7 @@ src/
     (app)/layout.tsx      one tree: sidebar on md+, tab bar on mobile
   components/             shared UI kit (ui.tsx), Sidebar, Heatmap, Toast
   db/                     schema.ts, lazy drizzle client
-  lib/                    date helpers, auth, progress math, heatmap
-  middleware.ts           session gate on every route except /login
+  lib/                    date helpers, progress math, heatmap
 ```
 
 The shell is **one** tree driven by breakpoints, not two. The sidebar is
@@ -365,8 +326,8 @@ browser's clock, or an 11pm check-off would land on the wrong day.
 
 ## Scope
 
-Built so far: **Roadmaps** · **Goals** · **Habits** · **DSA** (plus login and
-the app shell).
+Built so far: **Roadmaps** · **Goals** · **Habits** · **DSA** (plus the app
+shell).
 
 Habits deliberately has **no bottom-nav tab** — the bar stays at five
 (Today · Roadmaps · DSA · Goals · Health). `/habits` is the management screen;

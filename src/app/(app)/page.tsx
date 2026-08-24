@@ -2,7 +2,7 @@ import Link from "next/link";
 import { asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { goalMilestones, goals } from "@/db/schema";
-import { EmptyState, PageHeader, Pill, ProgressBar, SectionHeader, StatTile, TextButton } from "@/components/ui";
+import { EmptyState, PageHeader, Pill, ProgressBar, SectionHeader, StatTile } from "@/components/ui";
 import { IconAdd, IconDroplet, IconFlame, IconRepeat, IconSteps, IconTarget } from "@/components/icons";
 import { currentHour, formatShort, monthBounds, today } from "@/lib/date";
 import { computeGoalProgress } from "@/lib/goal-progress";
@@ -27,7 +27,6 @@ import HealthToday from "./health/HealthToday";
 import JournalToday from "./journal/JournalToday";
 import { getJournalEntry } from "./journal/queries";
 import { getSettings } from "./settings/queries";
-import { logout } from "../login/actions";
 import { listActiveTasks } from "./tasks/queries";
 
 export const dynamic = "force-dynamic";
@@ -127,11 +126,6 @@ export default async function TodayPage() {
       <PageHeader
         title="Today"
         subtitle={`${greeting(currentHour())} · ${formatShort(day)}`}
-        action={
-          <form action={logout}>
-            <TextButton type="submit">Lock</TextButton>
-          </form>
-        }
       />
 
       <dl className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">

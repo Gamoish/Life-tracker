@@ -1,20 +1,11 @@
 import fs from "node:fs/promises";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { sql } from "./db";
 
 /** Settings and the data export, against the live stack. */
 
-const PASSWORD = process.env.APP_PASSWORD ?? "change-me-now";
-
-async function login(page: Page) {
-  await page.goto("/login");
-  await page.fill("#password", PASSWORD);
-  await page.getByRole("button", { name: "Unlock" }).click();
-  await page.waitForURL("**/");
-}
-
 test.beforeEach(async ({ page }) => {
-  await login(page);
+  await page.goto("/");
 });
 
 test("the daily calorie goal saves and drives the progress indicator on Health", async ({ page }) => {
