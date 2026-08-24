@@ -353,6 +353,10 @@ export function StatTile({
   hint,
   tone = "neutral",
   icon,
+  /** 0–100. When set, draws a slim progress bar under the value — for tiles
+      that are also a goal-vs-actual (Today's Habits/Water/Calories tiles),
+      not just a readout. Omit rather than pass a fabricated number. */
+  progress,
   className = "",
 }: {
   label: string;
@@ -361,6 +365,7 @@ export function StatTile({
   tone?: Tone;
   /** Small glyph, top-right — decoration only, never the sole signal. */
   icon?: ReactNode;
+  progress?: number;
   className?: string;
 }) {
   return (
@@ -385,6 +390,7 @@ export function StatTile({
         {value}
       </p>
       {hint && <p className="mt-1.5 text-2xs text-faint">{hint}</p>}
+      {progress !== undefined && <ProgressBar value={progress} tone={tone} className="mt-2.5" />}
     </div>
   );
 }

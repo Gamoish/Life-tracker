@@ -12,8 +12,8 @@ export default function JournalHistory({ entries }: { entries: JournalRow[] }) {
     return (
       <EmptyState
         icon={<IconJournal />}
-        title="No entries yet"
-        hint="Log today's note from the Today page — it'll show up here."
+        title="No earlier entries yet"
+        hint="Come back tomorrow — today's note moves down here once a new day starts."
       />
     );
   }

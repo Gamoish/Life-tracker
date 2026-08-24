@@ -1,7 +1,6 @@
 import { formatShort, today } from "@/lib/date";
 import TaskBell from "@/app/(app)/tasks/TaskBell";
 import type { DueTaskSummary } from "@/app/(app)/tasks/queries";
-import SettingsLink from "@/app/(app)/settings/SettingsLink";
 import { CommandPaletteButton } from "./CommandPalette";
 import SidebarNav from "./SidebarNav";
 import ThemeToggle from "./ThemeToggle";
@@ -26,7 +25,6 @@ export default function Sidebar({ dueTasks }: { dueTasks: DueTaskSummary[] }) {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
-          <SettingsLink />
           <TaskBell items={dueTasks} placement="sidebar" />
         </div>
       </div>

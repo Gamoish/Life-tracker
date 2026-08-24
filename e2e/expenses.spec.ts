@@ -7,8 +7,7 @@ import { istToday, sql } from "./db";
  * The load-bearing test is the balance one: an account's balance is never
  * stored, only ever computed live as sum(income) - sum(expense), so adding
  * an income and an expense transaction and reading the balance back proves
- * that computation end to end — through the DB aggregate, the Accounts tab,
- * AND the Today page's widget, which must both agree with it.
+ * that computation end to end through the DB aggregate and the Accounts tab.
  */
 
 const uniq = (label: string) => `E2E ${label} ${Math.random().toString(36).slice(2, 8)}`;
@@ -70,7 +69,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
 });
 
-test("an income and an expense transaction update the account balance correctly, everywhere", async ({
+test("an income and an expense transaction update the account balance correctly", async ({
   page,
 }) => {
   const accountName = uniq("Wallet");
@@ -98,10 +97,6 @@ test("an income and an expense transaction update the account balance correctly,
   await page.goto("/expenses");
   await setTab(page, "accounts");
   await expect(accountRow(page, accountName).getByTestId("account-balance")).toContainText("649.50");
-
-  // The same number, independently recomputed, on the Today widget.
-  await page.goto("/");
-  await expect(page.getByText(/649\.50/)).toBeVisible();
 });
 
 test("editing an account balance logs exactly one adjustment transaction and updates everywhere", async ({
@@ -252,7 +247,7 @@ test("a recurring bill can be added, marked paid — creating a transaction and 
   await expect(row).toHaveCount(0);
 });
 
-test("a category budget shows spend against its cap and rolls into Today's over-budget summary", async ({
+test("a category budget shows spend against its cap and rolls into the Budgets tab's over-budget summary", async ({
   page,
 }) => {
   const accountName = uniq("BudgetAcc");
@@ -264,15 +259,14 @@ test("a category budget shows spend against its cap and rolls into Today's over-
   // The summary line only renders once at least one budget exists anywhere
   // in the system — with none yet, `.count()` is 0 rather than the element
   // being present with "0 of 0" text.
-  await page.goto("/");
+  await page.goto("/expenses");
+  await setTab(page, "budgets");
   const summaryBefore = page.getByTestId("budget-over-summary");
   const [beforeOver, beforeTotal] =
     (await summaryBefore.count()) > 0
       ? (await summaryBefore.textContent())!.match(/(\d+) of (\d+)/)!.slice(1).map(Number)
       : [0, 0];
 
-  await page.goto("/expenses");
-  await setTab(page, "budgets");
   await page.getByText("+ Set budget").click();
   const form = page.getByTestId("set-budget-form");
   await form.locator('select[name="categoryId"]').selectOption({ label: categoryName });
@@ -291,7 +285,8 @@ test("a category budget shows spend against its cap and rolls into Today's over-
   await expect(row).toContainText("over budget");
   await expect(row).toHaveAttribute("data-over", "true");
 
-  await page.goto("/");
+  await page.goto("/expenses");
+  await setTab(page, "budgets");
   await expect(page.getByTestId("budget-over-summary")).toContainText(
     `${beforeOver + 1} of ${beforeTotal + 1}`,
   );

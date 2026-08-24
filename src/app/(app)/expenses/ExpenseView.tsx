@@ -1047,16 +1047,23 @@ function BudgetsTab({
   budgetStatus: CategoryBudgetRow[];
   categories: CategoryNode[];
 }) {
+  const overCount = budgetStatus.filter((b) => b.spent > b.monthlyAmount).length;
+
   return (
     <>
       {budgetStatus.length === 0 ? (
         <EmptyState icon={<IconTarget />} title="No budgets set" hint="Cap a category's monthly spend below." />
       ) : (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {budgetStatus.map((b) => (
-            <BudgetRow key={b.categoryId} budget={b} />
-          ))}
-        </div>
+        <>
+          <p data-testid="budget-over-summary" className="mb-3 text-2xs text-faint">
+            {overCount} of {budgetStatus.length} categor{budgetStatus.length === 1 ? "y" : "ies"} over budget
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {budgetStatus.map((b) => (
+              <BudgetRow key={b.categoryId} budget={b} />
+            ))}
+          </div>
+        </>
       )}
       <SetBudgetForm categories={categories} className="mt-6" />
     </>

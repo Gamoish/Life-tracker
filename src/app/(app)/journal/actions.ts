@@ -8,10 +8,9 @@ export type FormState = { error?: string; ok?: boolean };
 
 function revalidateAll() {
   revalidatePath("/journal");
-  revalidatePath("/"); // Today embeds the quick-entry widget.
 }
 
-/** Always writes today's date — the Today widget only ever edits "now". */
+/** Always writes today's date — the entry form above the history only ever edits "now". */
 export async function saveTodayEntry(_prev: FormState, formData: FormData): Promise<FormState> {
   const text = String(formData.get("text") ?? "");
   await upsertJournalEntry(today(), text);

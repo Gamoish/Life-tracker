@@ -15,20 +15,20 @@ export type Destination = {
 /** The full destination list — desktop sidebar order, unchanged by the mobile nav cleanup below. */
 export const DESTINATIONS: Destination[] = [
   { href: "/", label: "Home", icon: IconHome },
-  { href: "/roadmaps", label: "Roadmaps", icon: IconRoadmap },
-  { href: "/goals", label: "Goals", icon: IconTarget },
   { href: "/habits", label: "Habits", icon: IconRepeat },
+  { href: "/goals", label: "Goals", icon: IconTarget },
+  { href: "/roadmaps", label: "Roadmaps", icon: IconRoadmap },
   { href: "/health", label: "Health", icon: IconHeart },
   { href: "/tasks", label: "Tasks", icon: IconTasks },
   { href: "/expenses", label: "Expenses", icon: IconExpense },
+  { href: "/journal", label: "Journal", icon: IconJournal },
+  { href: "/settings", label: "Settings", icon: IconSettings },
 ];
 
 /**
  * Mobile bottom bar, split into the tier tapped daily (rendered directly) and
- * everything else (behind the "More" sheet) — the full 7-plus-utility-icon
- * `DESTINATIONS` list was too cramped for one row. Journal isn't in
- * `DESTINATIONS` at all (see journal/page.tsx) but does belong in "More" —
- * it's the first real bottom-nav entry point it's had.
+ * everything else (behind the "More" sheet) — the full 9-item `DESTINATIONS`
+ * list is too cramped for one row at phone widths.
  */
 export const MOBILE_PRIMARY: Destination[] = [
   { href: "/", label: "Home", icon: IconHome },
@@ -137,7 +137,6 @@ function IconJournal() {
   );
 }
 
-/** Same gear path as `SettingsLink`'s inline icon — kept in sync by hand. */
 function IconSettings() {
   return (
     <svg {...svg}>
