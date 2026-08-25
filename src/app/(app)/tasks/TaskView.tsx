@@ -2,6 +2,18 @@
 
 import { startTransition, useActionState, useOptimistic, useState } from "react";
 import {
+  DndContext,
+  DragOverlay,
+  MouseSensor,
+  TouchSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
   Button,
   Card,
   CheckMark,
@@ -15,7 +27,7 @@ import {
   TextButton,
   Textarea,
 } from "@/components/ui";
-import { IconAdd } from "@/components/icons";
+import { IconAdd, IconGrip } from "@/components/icons";
 import { useToast } from "@/components/Toast";
 import { addDays, formatShort, weekBounds } from "@/lib/date";
 import { isDueOn, isOverdue, type TaskRecurrence } from "@/lib/task-schedule";
@@ -23,12 +35,49 @@ import DayPicker, { formatScheduledDays } from "../habits/DayPicker";
 import {
   addTask,
   deleteTask,
+  moveTaskDate,
   quickAddTask,
   toggleTask,
   updateTask,
   type FormState,
 } from "./actions";
 import type { TaskWithCompletions } from "./queries";
+
+/** The four drop targets in the Plan grid — see `TaskView`'s column setup. */
+type ColumnId = "today" | "this-week" | "next-week" | "upcoming";
+
+/**
+ * dnd-kit's Mouse/Touch sensors abort an in-progress drag on *any* `resize`
+ * or `visibilitychange` event on `window` — not just an actual viewport size
+ * change. A scrollbar toggling as the dragged row's column grows, or (on
+ * mobile, where this page actually lives) Safari's toolbar auto-hiding as
+ * the page scrolls, both fire a `resize` event with the dimensions
+ * unchanged, silently cancelling the drag before `onDragEnd` ever runs —
+ * verified against this exact page with a scripted drag; see
+ * https://github.com/clauderic/dnd-kit/issues/686 for the same failure mode.
+ * Both sensors bind that listener to `this.handleCancel` inside their own
+ * constructor before ours runs, so removing it right after `super()`, using
+ * that same bound reference, is the narrowest fix — Escape-to-cancel and a
+ * real pointercancel/touchcancel still work, since those are separate
+ * listeners this doesn't touch. `handleCancel` is typed `private` in
+ * dnd-kit's `.d.ts` (it's an ordinary runtime property, not a JS `#private`
+ * field), hence the `any` cast — TypeScript's privacy, not a real one.
+ */
+class ResizeSafeMouseSensor extends MouseSensor {
+  constructor(props: ConstructorParameters<typeof MouseSensor>[0]) {
+    super(props);
+    window.removeEventListener("resize", (this as any).handleCancel);
+    document.removeEventListener("visibilitychange", (this as any).handleCancel);
+  }
+}
+
+class ResizeSafeTouchSensor extends TouchSensor {
+  constructor(props: ConstructorParameters<typeof TouchSensor>[0]) {
+    super(props);
+    window.removeEventListener("resize", (this as any).handleCancel);
+    document.removeEventListener("visibilitychange", (this as any).handleCancel);
+  }
+}
 
 const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
 
@@ -86,11 +135,18 @@ export default function TaskView({
   categories: string[];
   today: string;
 }) {
-  const [optimistic, toggleLocally] = useOptimistic(
+  type OptimisticAction =
+    | { type: "toggle"; id: number }
+    | { type: "move"; id: number; dueDate: string };
+
+  const [optimistic, applyOptimistic] = useOptimistic(
     tasks,
-    (state: TaskWithCompletions[], id: number) =>
-      state.map((t) => {
-        if (t.id !== id) return t;
+    (state: TaskWithCompletions[], action: OptimisticAction) => {
+      if (action.type === "move") {
+        return state.map((t) => (t.id === action.id ? { ...t, dueDate: action.dueDate } : t));
+      }
+      return state.map((t) => {
+        if (t.id !== action.id) return t;
         if (t.recurrence === "one_off") {
           return { ...t, completedAt: t.completedAt ? null : new Date().toISOString() };
         }
@@ -100,7 +156,8 @@ export default function TaskView({
             ? t.completedDates.filter((d) => d !== today)
             : [...t.completedDates, today],
         };
-      }),
+      });
+    },
   );
 
   const rowsFor = (start: string, end: string) => {
@@ -120,10 +177,64 @@ export default function TaskView({
   const nextWeekRows = rowsFor(nextWeekStart, nextWeekEnd);
   const upcomingRows = optimistic.filter((t) => t.recurrence === "one_off" && t.dueDate > nextWeekEnd).map((task) => ({ task, status: summarize(task, today) }));
 
+  // Which column a task is *currently* showing in — reusing the rows already
+  // computed above rather than re-deriving the date-range math, so this can
+  // never disagree with what's actually on screen.
+  const columnOf = new Map<number, ColumnId>();
+  for (const { task } of todayRows) columnOf.set(task.id, "today");
+  for (const { task } of thisWeekRows) columnOf.set(task.id, "this-week");
+  for (const { task } of nextWeekRows) columnOf.set(task.id, "next-week");
+  for (const { task } of upcomingRows) columnOf.set(task.id, "upcoming");
+
+  // The due date a task adopts when dropped on each column. "This week" has
+  // no valid slot on the one day tomorrow spills past the week (today is the
+  // week's last day) — that column is a disabled drop target that day.
+  const columnTarget: Record<ColumnId, string | null> = {
+    today,
+    "this-week": tomorrow > weekEnd ? null : tomorrow,
+    "next-week": nextWeekStart,
+    upcoming: addDays(nextWeekEnd, 1),
+  };
+  const columnLabel: Record<ColumnId, string> = {
+    today: "Today",
+    "this-week": "This week",
+    "next-week": "Next week",
+    upcoming: "Upcoming",
+  };
+
   function toggle(task: TaskWithCompletions) {
     startTransition(async () => {
-      toggleLocally(task.id);
+      applyOptimistic({ type: "toggle", id: task.id });
       await toggleTask(task.id, task.recurrence);
+    });
+  }
+
+  const toast = useToast();
+  const [activeId, setActiveId] = useState<number | null>(null);
+  const activeTask = activeId !== null ? (optimistic.find((t) => t.id === activeId) ?? null) : null;
+
+  const sensors = useSensors(
+    useSensor(ResizeSafeMouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(ResizeSafeTouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveId(null);
+    const overId = event.over?.id;
+    if (typeof overId !== "string") return;
+    const column = overId as ColumnId;
+    const targetDate = columnTarget[column];
+    if (!targetDate) return;
+
+    const taskId = Number(event.active.id);
+    if (columnOf.get(taskId) === column) return;
+    const task = optimistic.find((t) => t.id === taskId);
+    if (!task) return;
+
+    toast(`${task.title} · moved to ${columnLabel[column]}`, "accent");
+    startTransition(async () => {
+      applyOptimistic({ type: "move", id: taskId, dueDate: targetDate });
+      await moveTaskDate(taskId, targetDate);
     });
   }
 
@@ -132,20 +243,85 @@ export default function TaskView({
       <QuickAddBar />
 
       <SectionHeader title="Plan" right={<span className="font-mono text-xs">{todayRows.length} today</span>} className="mt-6" />
-      <div className="grid gap-4 xl:grid-cols-3">
-        <TaskColumn title="Today" subtitle={formatShort(today)} rows={todayRows} onToggle={toggle} />
-        <TaskColumn title="This week" subtitle={`${formatShort(tomorrow)} – ${formatShort(weekEnd)}`} rows={thisWeekRows} onToggle={toggle} />
-        <TaskColumn title="Next week" subtitle={`${formatShort(nextWeekStart)} – ${formatShort(nextWeekEnd)}`} rows={nextWeekRows} onToggle={toggle} />
-      </div>
-      <TaskColumn title="Upcoming" subtitle="Later one-off tasks" rows={upcomingRows} onToggle={toggle} className="mt-6" />
+      <DndContext
+        sensors={sensors}
+        onDragStart={(event: DragStartEvent) => setActiveId(Number(event.active.id))}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveId(null)}
+      >
+        <div className="grid gap-4 xl:grid-cols-3">
+          <TaskColumn columnId="today" title="Today" subtitle={formatShort(today)} rows={todayRows} onToggle={toggle} />
+          <TaskColumn
+            columnId="this-week"
+            dropDisabled={columnTarget["this-week"] === null}
+            title="This week"
+            subtitle={`${formatShort(tomorrow)} – ${formatShort(weekEnd)}`}
+            rows={thisWeekRows}
+            onToggle={toggle}
+          />
+          <TaskColumn columnId="next-week" title="Next week" subtitle={`${formatShort(nextWeekStart)} – ${formatShort(nextWeekEnd)}`} rows={nextWeekRows} onToggle={toggle} />
+        </div>
+        <TaskColumn columnId="upcoming" title="Upcoming" subtitle="Later one-off tasks" rows={upcomingRows} onToggle={toggle} className="mt-6" />
+
+        <DragOverlay dropAnimation={{ duration: 180, easing: "ease" }}>
+          {activeTask && <DragPreview task={activeTask} />}
+        </DragOverlay>
+      </DndContext>
 
       <AddTaskForm categories={categories} today={today} className="mt-6" />
     </>
   );
 }
 
-function TaskColumn({ title, subtitle, rows, onToggle, className = "" }: { title: string; subtitle: string; rows: { task: TaskWithCompletions; status: TaskStatus }[]; onToggle: (task: TaskWithCompletions) => void; className?: string }) {
-  return <section className={`min-w-0 rounded-card border border-line bg-surface/50 p-3 ${className}`}><header className="mb-3 border-b border-line pb-2"><h2 className="font-display text-sm font-semibold tracking-tight">{title}</h2><p className="font-mono text-2xs text-faint">{subtitle}</p></header>{rows.length === 0 ? <p className="py-4 text-center text-xs text-faint">No tasks planned</p> : <ul className="space-y-2">{rows.map(({ task, status }) => <TaskRow key={task.id} task={task} status={status} onToggle={() => onToggle(task)} />)}</ul>}</section>;
+function DragPreview({ task }: { task: TaskWithCompletions }) {
+  return (
+    <div className="flex items-center gap-2 rounded-card border border-accent bg-surface px-3.5 py-2.5 shadow-lg shadow-black/20">
+      <IconGrip className="h-4 w-4 shrink-0 text-accent" />
+      <span className="truncate text-sm font-medium">{task.title}</span>
+    </div>
+  );
+}
+
+function TaskColumn({
+  title,
+  subtitle,
+  rows,
+  onToggle,
+  columnId,
+  dropDisabled = false,
+  className = "",
+}: {
+  title: string;
+  subtitle: string;
+  rows: { task: TaskWithCompletions; status: TaskStatus }[];
+  onToggle: (task: TaskWithCompletions) => void;
+  columnId: ColumnId;
+  dropDisabled?: boolean;
+  className?: string;
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id: columnId, disabled: dropDisabled });
+  const highlight = isOver && !dropDisabled;
+
+  return (
+    <section
+      ref={setNodeRef}
+      className={`min-w-0 rounded-card border p-3 transition-colors ${highlight ? "border-accent bg-accent-soft" : "border-line bg-surface/50"} ${className}`}
+    >
+      <header className="mb-3 border-b border-line pb-2">
+        <h2 className="font-display text-sm font-semibold tracking-tight">{title}</h2>
+        <p className="font-mono text-2xs text-faint">{subtitle}</p>
+      </header>
+      {rows.length === 0 ? (
+        <p className="py-4 text-center text-xs text-faint">No tasks planned</p>
+      ) : (
+        <ul className="space-y-2">
+          {rows.map(({ task, status }) => (
+            <TaskRow key={task.id} task={task} status={status} onToggle={() => onToggle(task)} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 }
 
 function QuickAddBar() {
@@ -186,8 +362,17 @@ function TaskRow({
   const [editing, setEditing] = useState(false);
   const toast = useToast();
 
+  // Only one-off tasks have a `dueDate` that means "when it's shown" — a
+  // recurring task's is a recurrence anchor, so dragging it between columns
+  // wouldn't reschedule it, just quietly corrupt its rule (see actions.ts).
+  const draggable = task.recurrence === "one_off";
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: task.id,
+    disabled: !draggable,
+  });
+
   return (
-    <li>
+    <li ref={setNodeRef} className={isDragging ? "opacity-30" : ""}>
       <Card
         className="p-3.5"
         data-testid="task-row"
@@ -197,6 +382,22 @@ function TaskRow({
         data-overdue={status.overdue ? "true" : "false"}
       >
         <div className="flex items-start gap-3">
+          <button
+            type="button"
+            disabled={!draggable}
+            {...(draggable ? listeners : {})}
+            {...(draggable ? attributes : {})}
+            aria-label={draggable ? `Drag ${task.title} to reschedule` : "Recurring tasks can't be dragged — edit to reschedule"}
+            title={draggable ? undefined : "Recurring tasks recur automatically — edit to reschedule"}
+            className={`mt-0.5 flex h-6 w-5 shrink-0 items-center justify-center rounded ${
+              draggable
+                ? "cursor-grab touch-none text-faint transition-colors hover:text-accent active:cursor-grabbing"
+                : "cursor-default text-faint/25"
+            }`}
+          >
+            <IconGrip className="h-4 w-4" />
+          </button>
+
           <button
             key={status.done ? "done" : "undone"}
             type="button"

@@ -149,6 +149,20 @@ export function IconLoan({ className = "h-4 w-4" }: IconProps) {
   );
 }
 
+/** Six-dot grip — the universal "press and drag this" affordance. */
+export function IconGrip({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <circle cx="9" cy="6" r="1.4" />
+      <circle cx="15" cy="6" r="1.4" />
+      <circle cx="9" cy="12" r="1.4" />
+      <circle cx="15" cy="12" r="1.4" />
+      <circle cx="9" cy="18" r="1.4" />
+      <circle cx="15" cy="18" r="1.4" />
+    </svg>
+  );
+}
+
 /** A coin dropping into a jar — savings goals. */
 export function IconPiggyBank({ className = "h-4 w-4" }: IconProps) {
   return (

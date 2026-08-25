@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { taskCompletions, tasks } from "@/db/schema";
@@ -128,6 +128,22 @@ export async function toggleTask(id: number, recurrence: TaskRecurrence, date?: 
         set: { done: sql`not ${taskCompletions.done}` },
       });
   }
+
+  revalidateAll();
+}
+
+/**
+ * Drag-and-drop between the Today/This week/Next week/Upcoming columns —
+ * only meaningful for one-off tasks, since a recurring task's `dueDate` is
+ * its recurrence anchor, not "when it next shows up" (see task-schedule.ts).
+ * The recurrence guard is belt-and-braces: the UI only makes one-off rows
+ * draggable, but a stale drag shouldn't be able to re-anchor a recurring one.
+ */
+export async function moveTaskDate(id: number, dueDate: string) {
+  await db
+    .update(tasks)
+    .set({ dueDate })
+    .where(and(eq(tasks.id, id), eq(tasks.recurrence, "one_off")));
 
   revalidateAll();
 }
