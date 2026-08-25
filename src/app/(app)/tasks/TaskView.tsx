@@ -1,6 +1,7 @@
 "use client";
 
-import { startTransition, useActionState, useOptimistic, useState } from "react";
+import { startTransition, useActionState, useEffect, useOptimistic, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   DndContext,
   DragOverlay,
@@ -213,6 +214,22 @@ export default function TaskView({
   const [activeId, setActiveId] = useState<number | null>(null);
   const activeTask = activeId !== null ? (optimistic.find((t) => t.id === activeId) ?? null) : null;
 
+  // `DragOverlay` doesn't portal itself — it renders inline wherever it sits
+  // in the tree. Left in place here, that's a descendant of `AppTemplate`'s
+  // `.fade-up-in` wrapper (src/app/(app)/template.tsx), whose entrance
+  // animation leaves `transform` engine-controlled by fill-mode: both even
+  // after it settles at its `transform: none` endpoint — Chromium reports it
+  // as `matrix(1,0,0,1,0,0)`, not the string "none", to getComputedStyle.
+  // Any non-"none" transform on an ancestor creates a new containing block
+  // for `position: fixed` descendants, so the overlay was positioning itself
+  // relative to that div instead of the viewport — the drag preview visibly
+  // detached from the cursor as soon as the page had scrolled or the sidebar
+  // shifted it horizontally. Portaling straight to `document.body` sidesteps
+  // that regardless of what future ancestors do. `mounted` guards SSR, where
+  // `document` doesn't exist yet.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const sensors = useSensors(
     useSensor(ResizeSafeMouseSensor, { activationConstraint: { distance: 6 } }),
     useSensor(ResizeSafeTouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
@@ -263,9 +280,13 @@ export default function TaskView({
         </div>
         <TaskColumn columnId="upcoming" title="Upcoming" subtitle="Later one-off tasks" rows={upcomingRows} onToggle={toggle} className="mt-6" />
 
-        <DragOverlay dropAnimation={{ duration: 180, easing: "ease" }}>
-          {activeTask && <DragPreview task={activeTask} />}
-        </DragOverlay>
+        {mounted &&
+          createPortal(
+            <DragOverlay dropAnimation={{ duration: 180, easing: "ease" }}>
+              {activeTask && <DragPreview task={activeTask} />}
+            </DragOverlay>,
+            document.body,
+          )}
       </DndContext>
 
       <AddTaskForm categories={categories} today={today} className="mt-6" />
@@ -275,7 +296,7 @@ export default function TaskView({
 
 function DragPreview({ task }: { task: TaskWithCompletions }) {
   return (
-    <div className="flex items-center gap-2 rounded-card border border-accent bg-surface px-3.5 py-2.5 shadow-lg shadow-black/20">
+    <div data-testid="drag-overlay" className="flex items-center gap-2 rounded-card border border-accent bg-surface px-3.5 py-2.5 shadow-lg shadow-black/20">
       <IconGrip className="h-4 w-4 shrink-0 text-accent" />
       <span className="truncate text-sm font-medium">{task.title}</span>
     </div>
