@@ -296,18 +296,20 @@ function GoalCard({ goal, today }: { goal: GoalNode; today: string }) {
             <li key={m.id} className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() =>
+                onClick={() => {
+                  if (!m.done) toast(`${m.title} · done`, "done");
                   startTransition(async () => {
                     toggleLocally(m.id);
                     await toggleMilestone(m.id);
-                  })
-                }
+                  });
+                }}
                 className="flex flex-1 items-center gap-2.5 rounded py-1.5 text-left text-sm"
               >
                 <span
+                  key={m.done ? "done" : "undone"}
                   className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors ${
                     m.done
-                      ? "border-done bg-done text-canvas"
+                      ? "pop-in border-done bg-done text-canvas"
                       : "border-line-strong"
                   }`}
                 >

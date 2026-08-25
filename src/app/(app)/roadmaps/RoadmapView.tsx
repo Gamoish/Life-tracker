@@ -16,6 +16,7 @@ import {
   StatTile,
   TOPIC_STATUS_LABEL,
 } from "@/components/ui";
+import { useToast } from "@/components/Toast";
 import {
   computeRoadmapProgress,
   formatPercent,
@@ -66,8 +67,10 @@ export default function RoadmapView({
     (t) => !parents.has(t.id) && isCounted(t) && t.status === "learning",
   ).length;
   const remaining = progress.total - progress.done;
+  const toast = useToast();
 
-  function handleCycle(id: number) {
+  function handleCycle(id: number, currentStatus: TopicStatus, title: string) {
+    if (currentStatus === "learning") toast(`${title} · done`, "done");
     startTransition(async () => {
       cycleLocally(id);
       await cycleTopicStatus(id);
@@ -135,7 +138,7 @@ export default function RoadmapView({
                   <li className="px-4 py-3 text-sm text-faint">No topics yet.</li>
                 ) : (
                   g.children.map((t) => (
-                    <TopicRow key={t.id} topic={t} onCycle={() => handleCycle(t.id)} />
+                    <TopicRow key={t.id} topic={t} onCycle={() => handleCycle(t.id, t.status, t.title)} />
                   ))
                 )}
               </ul>
@@ -223,9 +226,12 @@ function TopicRow({ topic, onCycle }: { topic: TopicNode; onCycle: () => void })
  * ring — so the three statuses are still distinguishable without hue.
  */
 function StatusDot({ status }: { status: TopicStatus }) {
+  // `key={status}` forces a remount on every cycle (done→not_started→learning
+  // are visually distinct shapes, not a color patch), so `pop-in` reliably
+  // replays each tap rather than only on first mount.
   if (status === "done") {
     return (
-      <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-done text-canvas transition-colors">
+      <span key={status} className="pop-in flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-done text-canvas transition-colors">
         <CheckMark className="h-2.5 w-2.5" />
       </span>
     );
@@ -233,14 +239,14 @@ function StatusDot({ status }: { status: TopicStatus }) {
 
   if (status === "learning") {
     return (
-      <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 border-wip transition-colors">
+      <span key={status} className="pop-in flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border-2 border-wip transition-colors">
         <span className="h-1.5 w-1.5 rounded-full bg-wip" />
       </span>
     );
   }
 
   return (
-    <span className="h-[18px] w-[18px] shrink-0 rounded-full border-2 border-line-strong transition-colors" />
+    <span key={status} className="pop-in h-[18px] w-[18px] shrink-0 rounded-full border-2 border-line-strong transition-colors" />
   );
 }
 

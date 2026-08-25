@@ -41,15 +41,13 @@ export default function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const commands = useMemo<Command[]>(() => {
-    const jumps: Command[] = [
-      ...DESTINATIONS.map((d) => ({
-        label: `Go to ${d.label}`,
-        hint: "Screen",
-        run: () => router.push(d.href),
-      })),
-      { label: "Go to Journal", hint: "Screen", run: () => router.push("/journal") },
-      { label: "Go to Settings", hint: "Screen", run: () => router.push("/settings") },
-    ];
+    // `DESTINATIONS` already includes Journal and Settings, so this no
+    // longer needs to bolt them on separately.
+    const jumps: Command[] = DESTINATIONS.map((d) => ({
+      label: `Go to ${d.label}`,
+      hint: "Screen",
+      run: () => router.push(d.href),
+    }));
     return [...jumps, { label: "Toggle theme", hint: "Action", run: () => toggleTheme() }];
   }, [router]);
 
@@ -105,12 +103,12 @@ export default function CommandPalette() {
   return (
     <div
       onClick={close}
-      className="fixed inset-0 z-[95] flex items-start justify-center bg-black/50 px-5 pb-5"
+      className="backdrop-in fixed inset-0 z-[95] flex items-start justify-center bg-black/50 px-5 pb-5"
       style={{ paddingTop: "12vh" }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg overflow-hidden rounded-xl border border-line-strong bg-surface shadow-[0_18px_48px_-12px_rgba(0,0,0,0.55)]"
+        className="fade-up-in w-full max-w-lg overflow-hidden rounded-xl border border-line-strong bg-surface shadow-[0_18px_48px_-12px_rgba(0,0,0,0.55)]"
       >
         <div className="flex items-center gap-2.5 border-b border-line px-4 py-3.5">
           <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-faint" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden>

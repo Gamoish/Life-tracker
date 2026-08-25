@@ -23,9 +23,11 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
     <button
       type="button"
       onClick={() => setTheme(toggleTheme())}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-2 font-mono text-xs text-muted transition-colors hover:border-accent/50 hover:text-ink ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg border border-line-strong bg-surface px-3 py-2 font-mono text-xs text-muted transition-colors hover:border-accent/50 hover:text-ink active:scale-95 ${className}`}
     >
-      {theme === "dark" ? <IconSun /> : <IconMoon />}
+      <span key={theme} className="pop-in inline-flex">
+        {theme === "dark" ? <IconSun /> : <IconMoon />}
+      </span>
       <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
     </button>
   );

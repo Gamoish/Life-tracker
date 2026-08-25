@@ -136,7 +136,8 @@ export default async function TodayPage() {
           return (
             <div
               key={date}
-              className={`flex flex-col items-center gap-1.5 rounded-card border px-1.5 py-2.5 ${
+              style={{ animationDelay: `${i * 35}ms` }}
+              className={`fade-up-in flex flex-col items-center gap-1.5 rounded-card border px-1.5 py-2.5 ${
                 isToday ? "border-accent bg-accent-soft" : "border-line bg-surface"
               }`}
             >
@@ -163,6 +164,7 @@ export default async function TodayPage() {
           tone={dueHabits.length > 0 && doneHabits === dueHabits.length ? "done" : "accent"}
           progress={dueHabits.length > 0 ? (doneHabits / dueHabits.length) * 100 : 0}
           icon={<IconRepeat />}
+          className="fade-up-in [animation-delay:0ms]"
         />
         <StatTile
           label="Water"
@@ -171,8 +173,14 @@ export default async function TodayPage() {
           tone={healthSummary.waterMl >= settings.dailyWaterGoalMl ? "done" : "accent"}
           progress={(healthSummary.waterMl / settings.dailyWaterGoalMl) * 100}
           icon={<IconDroplet filled />}
+          className="fade-up-in [animation-delay:40ms]"
         />
-        <StatTile label="Steps" value={healthSummary.steps ?? "—"} icon={<IconSteps />} />
+        <StatTile
+          label="Steps"
+          value={healthSummary.steps ?? "—"}
+          icon={<IconSteps />}
+          className="fade-up-in [animation-delay:80ms]"
+        />
         <StatTile
           label="Calories"
           value={healthSummary.calories}
@@ -186,11 +194,12 @@ export default async function TodayPage() {
           }
           progress={settings.calorieGoal ? (healthSummary.calories / settings.calorieGoal) * 100 : undefined}
           icon={<IconFlame />}
+          className="fade-up-in [animation-delay:120ms]"
         />
       </dl>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <Card className="p-5">
+        <Card className="fade-up-in p-5 [animation-delay:160ms]">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h3 className="font-display text-lg font-semibold tracking-tight">Habits due today</h3>
             <Link href="/habits" className="font-mono text-xs text-muted hover:text-accent">
@@ -207,7 +216,7 @@ export default async function TodayPage() {
         </Card>
 
         <div className="flex flex-col gap-4">
-          <Card className="p-5">
+          <Card className="fade-up-in p-5 [animation-delay:200ms]">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="font-display text-lg font-semibold tracking-tight">Active goals</h3>
               <Link href="/goals" className="font-mono text-xs text-muted hover:text-accent">
@@ -233,7 +242,7 @@ export default async function TodayPage() {
             )}
           </Card>
 
-          <Card className="p-5">
+          <Card className="fade-up-in p-5 [animation-delay:240ms]">
             <h3 className="mb-4 font-display text-lg font-semibold tracking-tight">Up next</h3>
             {upNext.length === 0 ? (
               <p className="text-sm text-faint">Nothing due soon.</p>

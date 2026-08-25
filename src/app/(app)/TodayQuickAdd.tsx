@@ -7,7 +7,7 @@ import { useToast } from "@/components/Toast";
 import { logWaterBottle } from "./health/actions";
 
 const PILL =
-  "inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-raised px-3.5 py-2 text-xs font-semibold text-ink transition-colors hover:border-accent/40 [&_svg]:h-3.5 [&_svg]:w-3.5";
+  "inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-raised px-3.5 py-2 text-xs font-semibold text-ink transition-[background-color,border-color,transform] duration-150 hover:border-accent/40 active:scale-95 [&_svg]:h-3.5 [&_svg]:w-3.5";
 
 /**
  * Today's "Quick add" row — the mockup's Log water / Log food / Add task

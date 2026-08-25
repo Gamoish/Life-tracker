@@ -42,7 +42,7 @@ export default function BottomNav() {
                 {active && (
                   <span
                     aria-hidden
-                    className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-accent"
+                    className="pop-in absolute inset-x-4 top-0 h-0.5 rounded-full bg-accent"
                   />
                 )}
                 <Icon />
@@ -78,11 +78,11 @@ export default function BottomNav() {
                 aria-label="Close"
                 tabIndex={-1}
                 onClick={() => setMoreOpen(false)}
-                className="fixed inset-0 z-30 cursor-default"
+                className="backdrop-in fixed inset-0 z-30 cursor-default"
               />
               <div
                 data-testid="more-menu-panel"
-                className="absolute right-0 bottom-full z-40 mb-2 w-56 rounded-card border border-line bg-gradient-to-b from-raised/80 to-surface p-1.5 shadow-[0_20px_44px_-20px_rgba(0,0,0,0.7)]"
+                className="sheet-up-in absolute right-0 bottom-full z-40 mb-2 w-56 rounded-card border border-line bg-gradient-to-b from-raised/80 to-surface p-1.5 shadow-[0_20px_44px_-20px_rgba(0,0,0,0.7)]"
               >
                 <ul className="space-y-0.5">
                   {MOBILE_MORE.map(({ href, label, icon: Icon }) => {

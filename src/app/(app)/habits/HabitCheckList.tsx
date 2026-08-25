@@ -3,6 +3,7 @@
 import { startTransition, useOptimistic } from "react";
 import { CheckMark, EmptyState } from "@/components/ui";
 import { IconAdd, IconFlame } from "@/components/icons";
+import { useToast } from "@/components/Toast";
 import { isoWeekday } from "@/lib/date";
 import { summarize } from "@/lib/habit-streak";
 import { toggleHabit } from "./actions";
@@ -52,6 +53,7 @@ export default function HabitCheckList({
           : h,
       ),
   );
+  const toast = useToast();
 
   const due = optimistic
     .map((habit) => ({ habit, summary: summarize(habit, habit.doneDates, today) }))
@@ -81,12 +83,13 @@ export default function HabitCheckList({
             data-streak={summary.streak}
             data-color={habit.color}
             aria-pressed={summary.doneToday}
-            onClick={() =>
+            onClick={() => {
+              if (!summary.doneToday) toast(`${habit.name} · checked off`, "done");
               startTransition(async () => {
                 toggleLocally(habit.id);
                 await toggleHabit(habit.id);
-              })
-            }
+              });
+            }}
             className={`flex h-full w-full items-center gap-3 rounded-card border px-4 py-3.5 text-left transition-all hover:-translate-y-0.5 ${HABIT_COLOR_GLOW[habit.color]} ${
               summary.doneToday
                 ? "border-done/30 bg-done-soft"
@@ -94,9 +97,10 @@ export default function HabitCheckList({
             }`}
           >
             <span
+              key={summary.doneToday ? "done" : "undone"}
               className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
                 summary.doneToday
-                  ? "scale-100 border-done bg-done text-canvas shadow-[0_0_12px_-1px_rgba(84,203,126,0.65)]"
+                  ? "pop-in scale-100 border-done bg-done text-canvas shadow-[0_0_12px_-1px_rgba(84,203,126,0.65)]"
                   : "scale-90 border-line-strong text-transparent"
               }`}
             >

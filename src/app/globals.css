@@ -172,6 +172,12 @@
     background-color: var(--c-canvas);
     color: var(--c-ink);
     overscroll-behavior-y: none;
+    /* The only place background/text color transition — everywhere else a
+       hover/press state already owns its own transition, and layering a
+       second one on top reads as lag rather than polish. This is purely for
+       the theme toggle: an instant `data-theme` flip otherwise reads as a
+       flash instead of a switch. */
+    transition: background-color 0.35s ease, color 0.35s ease;
     /* Ambient light rather than a flat void — two soft, fixed glows bleeding
        in from off-screen. Same reasoning as the heatmap's own colour: a
        shadow on a near-black surface barely reads, but a low-opacity glow
@@ -230,6 +236,73 @@
 
 .toast-in {
   animation: toast-in 0.22s ease-out;
+}
+
+/* Content settling into place — page entrances, list rows, revealed panels. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.625rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-up-in {
+  animation: fade-up 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* A one-shot confirmation pop — paired with a React `key` change so it
+   replays every time a checkbox/checkmark actually flips, not on every
+   unrelated re-render. */
+@keyframes pop {
+  0% {
+    transform: scale(0.75);
+    opacity: 0.6;
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pop-in {
+  animation: pop 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* A backdrop clearing its throat before the sheet/panel above it appears. */
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.backdrop-in {
+  animation: backdrop-in 0.18s ease-out both;
+}
+
+/* The mobile "More" sheet — rises from the bottom bar it was tapped from. */
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sheet-up-in {
+  animation: sheet-up 0.24s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 /* Motion is decoration here — never the only signal — so it can all go. */

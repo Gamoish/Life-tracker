@@ -198,13 +198,17 @@ function TaskRow({
       >
         <div className="flex items-start gap-3">
           <button
+            key={status.done ? "done" : "undone"}
             type="button"
             aria-pressed={status.done}
             aria-label={status.done ? `Mark ${task.title} not done` : `Mark ${task.title} done`}
-            onClick={onToggle}
+            onClick={() => {
+              if (!status.done) toast(`${task.title} · done`, "done");
+              onToggle();
+            }}
             className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200 ${
               status.done
-                ? "scale-100 border-done bg-done text-canvas shadow-[0_0_12px_-1px_rgba(84,203,126,0.65)]"
+                ? "pop-in scale-100 border-done bg-done text-canvas shadow-[0_0_12px_-1px_rgba(84,203,126,0.65)]"
                 : "scale-90 border-line-strong text-transparent hover:scale-100 hover:border-accent"
             }`}
           >
