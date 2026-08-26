@@ -266,7 +266,7 @@ export default function TaskView({
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}
       >
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           <TaskColumn columnId="today" title="Today" subtitle={formatShort(today)} rows={todayRows} onToggle={toggle} />
           <TaskColumn
             columnId="this-week"

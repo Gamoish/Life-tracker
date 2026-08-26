@@ -32,7 +32,7 @@ export default function HabitManager({ habits }: { habits: ManagedHabit[] }) {
       )}
 
       {active.length > 0 && (
-        <div className="grid gap-2 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
           {active.map((h) => (
             <HabitRow key={h.id} habit={h} />
           ))}
@@ -43,7 +43,7 @@ export default function HabitManager({ habits }: { habits: ManagedHabit[] }) {
         /* The label text is matched verbatim by the e2e suite — keep the count
            in parentheses and nothing else inside the summary. */
         <Disclosure label={`Archived (${archived.length})`}>
-          <div className="grid gap-2 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
             {archived.map((h) => (
               <HabitRow key={h.id} habit={h} />
             ))}

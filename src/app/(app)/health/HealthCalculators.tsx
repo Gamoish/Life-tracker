@@ -25,7 +25,7 @@ export default function HealthCalculators({ weightKg, weightUnit }: { weightKg: 
   const defaultWeight = weightKg === null ? "" : toDisplay(weightKg, weightUnit).toFixed(1);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <Card className="p-4">
         <h3 className="font-display text-sm font-semibold tracking-tight">BMI calculator</h3>
         <p className="mt-1 text-xs text-muted">Your last saved result appears on Home.</p>

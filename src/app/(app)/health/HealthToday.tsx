@@ -1,9 +1,8 @@
 "use client";
 
 import { startTransition, useActionState, useOptimistic } from "react";
-import { Button, EmptyState, Input, ProgressBar, Select, StatTile, TextButton } from "@/components/ui";
-import { IconAdd, IconDroplet, IconFlame, IconMoon, IconScale, IconSteps } from "@/components/icons";
-import { formatDuration } from "@/lib/sleep";
+import { Button, EmptyState, Input, ProgressBar, Select, TextButton } from "@/components/ui";
+import { IconAdd, IconDroplet, IconScale } from "@/components/icons";
 import { formatWeight, toDisplay, type WeightUnit } from "@/lib/weight-unit";
 import {
   addFood,
@@ -27,14 +26,13 @@ const MEAL_LABEL: Record<MealType, string> = {
 };
 
 /**
- * Today's health at a glance, plus the taps that don't deserve a trip to
- * `/health`: a bottle/custom water log, a weight entry, logging sleep,
- * logging a food item. Props-only and self-contained — same contract as
- * `HabitCheckList` — so it's embedded verbatim both here and on the Today
- * dashboard.
+ * The taps that don't deserve a trip through a full form: a bottle/custom water
+ * log, a weight entry, logging sleep, logging a food item — plus today's food
+ * list. Props-only and self-contained, so the Health page can drop it straight
+ * into its "log today" section. The at-a-glance summary tiles live at the page
+ * level now (see `health/page.tsx`), so this is purely the interactive logging.
  */
 export default function HealthToday({
-  steps,
   weightKg,
   waterMl,
   calories,
@@ -45,7 +43,6 @@ export default function HealthToday({
   dailyWaterGoalMl,
   weightUnit,
 }: {
-  steps: number | null;
   weightKg: number | null;
   waterMl: number;
   calories: number;
@@ -58,26 +55,6 @@ export default function HealthToday({
 }) {
   return (
     <div className="space-y-4">
-      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile label="Steps" value={steps ?? "—"} icon={<IconSteps />} />
-        <StatTile
-          label="Sleep"
-          value={sleep ? formatDuration(sleep.durationMin) : "—"}
-          icon={<IconMoon />}
-        />
-        <StatTile
-          label="Weight"
-          value={weightKg !== null ? formatWeight(weightKg, weightUnit) : "—"}
-          icon={<IconScale />}
-        />
-        <StatTile
-          label="Calories"
-          value={calories}
-          hint={calorieGoal ? `of ${calorieGoal} goal` : `${food.length} items`}
-          icon={<IconFlame />}
-        />
-      </dl>
-
       <WaterBox waterMl={waterMl} bottleSizeMl={bottleSizeMl} dailyWaterGoalMl={dailyWaterGoalMl} />
 
       {calorieGoal !== null && (

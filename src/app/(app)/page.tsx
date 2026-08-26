@@ -12,12 +12,12 @@ import { summarizeDay } from "@/lib/health";
 import { getHealthDay } from "@/lib/health-queries";
 import { getRoadmapProgressMap } from "@/lib/roadmap-queries";
 import { mergeUpcoming, type UpcomingItem } from "@/lib/upcoming";
-import { getUpcomingBills, getUpcomingEmis } from "./expenses/queries";
+import { getUpcomingBills, getUpcomingEmis, listAccounts, listCategories } from "./expenses/queries";
 import HabitCheckList, { type HabitNode } from "./habits/HabitCheckList";
 import { listHabitsWithLogs } from "./habits/queries";
 import { getSettings } from "./settings/queries";
 import { listActiveTasks, summarizeDueTasks } from "./tasks/queries";
-import TodayQuickAdd from "./TodayQuickAdd";
+import QuickAddBar from "./QuickAddBar";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +44,8 @@ export default async function TodayPage() {
     tasks,
     upcomingBills,
     upcomingEmis,
+    accounts,
+    categories,
   ] = await Promise.all([
     listHabitsWithLogs(),
     db.select().from(goals).where(eq(goals.status, "active")).orderBy(asc(goals.id)),
@@ -52,11 +54,18 @@ export default async function TodayPage() {
     listActiveTasks(),
     getUpcomingBills(day, 7),
     getUpcomingEmis(day, 7),
+    listAccounts(),
+    listCategories(),
   ]);
 
   const activeHabits = habitRows.filter((h) => h.active);
   const dueHabits = activeHabits.filter((h) => isScheduledDay(h.scheduledDays, day));
   const doneHabits = dueHabits.filter((h) => h.doneDates.includes(day)).length;
+
+  // Only the habits still awaiting a check-off feed the quick-add picker.
+  const quickHabits = dueHabits
+    .filter((h) => !h.doneDates.includes(day))
+    .map((h) => ({ id: h.id, name: h.name, color: h.color }));
 
   const checkList: HabitNode[] = activeHabits.map((h) => ({
     id: h.id,
@@ -198,7 +207,7 @@ export default async function TodayPage() {
         />
       </dl>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <Card className="fade-up-in p-5 [animation-delay:160ms]">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h3 className="font-display text-lg font-semibold tracking-tight">Habits due today</h3>
@@ -211,7 +220,14 @@ export default async function TodayPage() {
             <p className="mb-2.5 text-2xs font-semibold uppercase tracking-[0.14em] text-faint">
               Quick add
             </p>
-            <TodayQuickAdd bottleSizeMl={settings.bottleSizeMl} />
+            <QuickAddBar
+              bottleSizeMl={settings.bottleSizeMl}
+              weightUnit={settings.weightUnit}
+              todayWeightKg={healthSummary.weightKg}
+              accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+              categories={categories}
+              dueHabits={quickHabits}
+            />
           </div>
         </Card>
 

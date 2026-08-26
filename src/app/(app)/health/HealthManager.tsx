@@ -27,6 +27,7 @@ import type {
 import {
   addWorkout,
   clearMetric,
+  deleteFood,
   deleteWater,
   deleteWorkout,
   editWorkout,
@@ -453,8 +454,15 @@ function FoodHistorySection({ history }: { history: FoodDayHistory[] }) {
                       {f.item}
                       {f.meal && <span className="ml-1.5 text-faint">· {MEAL_LABEL[f.meal]}</span>}
                     </span>
-                    <span className="shrink-0 font-mono tabular-nums text-faint">
-                      {f.calories ?? "—"}
+                    <span className="flex shrink-0 items-center gap-2">
+                      <span className="font-mono tabular-nums text-faint">{f.calories ?? "—"}</span>
+                      <TextButton
+                        tone="warn"
+                        data-testid="delete-food-history"
+                        onClick={() => startTransition(() => deleteFood(f.id))}
+                      >
+                        ✕
+                      </TextButton>
                     </span>
                   </li>
                 ))}

@@ -2,8 +2,9 @@ import { Card, SectionHeader, PageHeader, StatTile } from "@/components/ui";
 import Heatmap from "@/components/Heatmap";
 import { formatShort, today } from "@/lib/date";
 import { activityStreak, buildHeatmap } from "@/lib/heatmap";
-import { isScheduledDay } from "@/lib/habit-streak";
+import { currentStreak, isScheduledDay } from "@/lib/habit-streak";
 import HabitCheckList, { type HabitNode } from "./HabitCheckList";
+import HabitCalendars, { type HabitCalendar } from "./HabitCalendars";
 import HabitManager, { type ManagedHabit } from "./HabitManager";
 import { listHabitsWithLogs } from "./queries";
 
@@ -35,6 +36,17 @@ export default async function HabitsPage() {
     scheduledDays: h.scheduledDays,
     color: h.color,
     active: h.active,
+  }));
+
+  // Per-habit calendars — derived from the same `doneDates` already fetched
+  // above, so charting every habit costs no extra queries.
+  const calendars: HabitCalendar[] = activeHabits.map((h) => ({
+    id: h.id,
+    name: h.name,
+    color: h.color,
+    scheduledDays: h.scheduledDays,
+    doneDates: h.doneDates,
+    streak: currentStreak(h.scheduledDays, h.doneDates, day),
   }));
 
   const activity = activeHabits.flatMap((h) => h.doneDates);
@@ -81,6 +93,11 @@ export default async function HabitsPage() {
 
         <Heatmap data={grid} label="Daily consistency" />
       </Card>
+
+      <SectionHeader title="Calendars" right={`${calendars.length} habit${calendars.length === 1 ? "" : "s"}`} />
+      <div className="mb-8">
+        <HabitCalendars habits={calendars} today={day} />
+      </div>
 
       <SectionHeader title="Today" right={`${doneToday} of ${dueToday.length}`} />
       <HabitCheckList habits={checkList} today={day} />
